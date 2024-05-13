@@ -1,6 +1,6 @@
 class Rect
 {
-    constructor(type = "none", {x,y,w,h,o}, c, collision = "BLOCKALL")
+    constructor(type = "none", {x,y,w,h,o}, c, collision = _BLOCKALL)
     {
         this.type = type;
         this.name = "nameless";
@@ -16,17 +16,15 @@ class Rect
 
     updateCollision({l,r,t,b})
     {
-        if (this.collision == "BLOCKALL")
-        {
-            if (!l)
-                t = PLAYER.collideLeft(this.t);
-            if (!r)
-                t = PLAYER.collideRight(this.t);
-            if (!t)
-                t = PLAYER.collideTop(this.t);
-            if (!b)
-                b = PLAYER.collideBottom(this.t);
-        }
+        if (this.collision.r && !l)
+            t = PLAYER.collideLeft(this.t);
+        if (this.collision.l && !r)
+            t = PLAYER.collideRight(this.t);
+        if (this.collision.b && !t)
+            t = PLAYER.collideTop(this.t);
+        if (this.collision.t && !b)
+            b = PLAYER.collideBottom(this.t);
+
         return {l:l,r:r,t:t,b:b};
     }
 
@@ -87,7 +85,7 @@ class Rect
 
 class Box extends Rect
 {
-    constructor({x,y,w,h,o}, c, collision = "BLOCKALL")
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL)
     {
         super("color", {x,y,w,h,o}, c, collision);
     }
@@ -95,7 +93,7 @@ class Box extends Rect
 
 class Img extends Rect
 {
-    constructor({x,y,w,h,o}, c, collision = "BLOCKALL")
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL)
     {
         super("img", {x,y,w,h,o}, c, collision);
     }
@@ -103,7 +101,7 @@ class Img extends Rect
 
 class Dynamic extends Rect
 {
-    constructor(type, {x,y,w,h,o}, c, collision = "BLOCKALL")
+    constructor(type, {x,y,w,h,o}, c, collision = _BLOCKALL)
     {
         super(type, {x,y,w,h,o}, c, collision)
         
@@ -147,7 +145,7 @@ class Dynamic extends Rect
 
 class Physics extends Dynamic
 {
-    constructor(type, {x,y,w,h,o}, c, collision = "BLOCKALL")
+    constructor(type, {x,y,w,h,o}, c, collision = _BLOCKALL)
     {
         super(type, {x,y,w,h,o}, c, collision)
 
@@ -164,86 +162,10 @@ class Physics extends Dynamic
             this.v.y += _GRAVITY*this.gravityMultiplier;
         this.t.y -= this.v.y;
         this.t.x += this.v.x;
-        if (this.collision == "BLOCKALL")
+        if (this.collision == _BLOCKALL)
         {
             this.isOCollidingWith(PLAYER.t)
         }
-    }
-}
-
-class Button extends Dynamic
-{
-    constructor(type, {x,y,w,h,o}, c, action = undefined, cc = undefined, cs = undefined, hc = undefined, hs = undefined, collision = "BLOCKALL")
-    {
-        super(type, {x,y,w,h,o}, c, collision);
-
-        this.action = action;
-
-        this.interactable = true;
-        this.canHover = false;
-        this.canClick = false;
-
-        if (hc != undefined)
-        {
-            this.canHover = true;
-            this.hc = hc;
-            this.hs = hs;
-
-            document.addEventListener("mousemove", (e) =>
-            {
-                const p = toCanvasCoords(e.clientX, e.clientY);
-                if (!this.isOCollidingWith({x:p.x, y:p.y, w:0, h:0}))
-                {
-                    this.hovering = false;
-                    this.c = this.oc;
-                    this.scaleTo({w:this.ot.w, h:this.ot.h});
-                }
-                else if (!this.hovering && this.canHover)
-                {
-                    this.c = this.hc;
-                    this.scaleBy(hs);
-                    this.hovering = true;
-                }
-            });
-        }
-
-        if (cc != undefined)
-        {
-            this.canClick = true;
-            this.cc = cc;
-            this.cs = cs;
-
-            document.addEventListener("mousedown", (e) =>
-            {
-                const p = toCanvasCoords(e.clientX, e.clientY);
-                if (this.isCollidingWith({x:p.x, y:p.y, w:0, h:0}) && this.canClick)
-                {
-                    this.c = this.cc;
-                    this.scaleBy(cs);
-                }
-            });
-
-            document.addEventListener("mouseup", (e) =>
-            {
-                const p = toCanvasCoords(e.clientX, e.clientY);
-                if (this.action != undefined && this.isOCollidingWith({x:p.x, y:p.y, w:0, h:0}))
-                {
-                    if (this.canClick || this.canHover)
-                    {
-                        this.c = this.oc;
-                        this.scaleTo({w:this.ot.w, h:this.ot.h});
-                        if (this.hovering)
-                        {
-                            this.c = this.hc;
-                            this.scaleBy(hs);
-                        }
-                    }
-
-                    this.action();
-                }
-            });
-        }
-        
     }
 }
 
@@ -258,7 +180,7 @@ class Player extends Physics
     {
         super(type, {x,y,w,h,o}, c);
 
-        this.collision = "ACTOR";
+        this.collision = _NOCOLLISION;
         this.player = true;
         
         // Movements
@@ -311,9 +233,9 @@ class Player extends Physics
         }
 
         window.addEventListener("keydown", (e) => {
-            if (e.code == "ShiftLeft" && !this.dashing && this.direction != 0)
+            if (e.code == "ShiftLeft" && !this.dashing)
             {
-                if (this.maxV.x != this.runningSpeed)
+                if (this.direction != 0 && this.maxV.x != this.runningSpeed)
                     this.maxV.x = this.runningSpeed;
 
                 this.shifting = true;

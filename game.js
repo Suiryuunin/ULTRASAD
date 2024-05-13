@@ -1,5 +1,8 @@
 const res = {w:1920, h:1080};
 
+const _NOCOLLISION = {l:false, r:false, t:false, b:false};
+const _BLOCKALL = {l:true, r:true, t:true, b:true};
+const _PLATFORM = {l:false, r:false, t:true, b:false};
 const _GRAVITY = -1.2;
 const _VCENTER = {x: Math.floor(res.w/2), y: Math.floor(res.h/2)};
 const _NOOFFSET = {x:0,y:0};

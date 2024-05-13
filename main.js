@@ -49,7 +49,10 @@ const update = () =>
     {
         if (element.active)
         {
-            element.updateCollision();
+            if (!colliding.l || !colliding.r || !colliding.t || !colliding.b)
+                colliding = element.updateCollision(colliding);
+            else
+                break;
         }
     }
 };
