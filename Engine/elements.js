@@ -197,7 +197,7 @@ class Player extends Physics
         this.jumpCounter = this.jumpSteps;
         this.jumping = false;
 
-        this.maxV.x = 8;
+        this.maxV.x = this.walkingSpeed;
         this.acceleration = 2;
         this.speed = this.acceleration;
 
@@ -266,7 +266,7 @@ class Player extends Physics
                 if (this.maxV.x != this.walkingSpeed)
                     this.maxV.x = this.walkingSpeed;
 
-                if (this.sprintCounter <= 8 && this.sprintCounter != 0 && this.canDash && this.dashCooldown == 0)
+                if (this.sprintCounter <= 12 && this.sprintCounter != 0 && this.canDash && this.dashCooldown == 0)
                 {
                     this.maxV.x = 96;
                     this.speed = 64;
