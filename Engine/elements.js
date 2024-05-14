@@ -185,21 +185,13 @@ class Player extends Physics
         
         // Movements
         this.direction = 0;
+        this.frozenDirection = 1;
 
-        this.walkingSpeed = 4;
-        this.runningSpeed = 6;
-        this.sprintSpeed = 8;
-        this.airControl = 0.2;
+        this.walkingSpeed = 4; this.runningSpeed = 6; this.sprintSpeed = 8; this.airControl = 0.2;
 
-        this.jumpStrength = 24;
-        this.jumpSteps = 5;
-        this.jumpStepsLeft = this.jumpSteps;
-        this.jumpCounter = this.jumpSteps;
-        this.jumping = false;
+        this.maxV.x = this.walkingSpeed; this.acceleration = 2; this.speed = this.acceleration;
 
-        this.maxV.x = this.walkingSpeed;
-        this.acceleration = 2;
-        this.speed = this.acceleration;
+        this.jumpStrength = 24; this.jumpSteps = 5; this.jumpStepsLeft = this.jumpSteps; this.jumpCounter = this.jumpSteps; this.jumping = false;
 
         this.axisMapping = {
             "KeyA":-1,
@@ -213,13 +205,10 @@ class Player extends Physics
         }
 
         this.sprintCounter = 0;
-        this.dashDuration = 2;
-        this.dashTimer = this.dashDuration;
-        this.dashing = false;
+
+        this.dashDuration = 2; this.dashTimer = this.dashDuration; this.dashing = false; this.canDash = false; this.dashCooldown = 0;
+
         this.shifting = false;
-        this.frozenDirection = 1;
-        this.canDash = false;
-        this.dashCooldown = 0;
 
         this.convertKeys = (code) =>
         {
@@ -235,54 +224,32 @@ class Player extends Physics
         window.addEventListener("keydown", (e) => {
             if (e.code == "ShiftLeft" && !this.dashing)
             {
-                if (this.direction != 0 && this.maxV.x != this.runningSpeed)
-                    this.maxV.x = this.runningSpeed;
-
+                this.run();
                 this.shifting = true;
-            }
-
+            } //
             const code = this.convertKeys(e.code);
-            if (code != "urmom")
+            if (code == "urmom" || this.keys[code])
+                return;
+            if (code == "KeyK")
             {
-                if (!this.keys[code])
+                if (this.grounded && !this.jumping)
                 {
-                    if (code == "KeyK" && this.grounded && !this.jumping)
-                    {
-                        this.jumping = true;
-                        this.v.y = 0;
-                        this.keys[code] = true;
-                        return;
-                    }
-                    this.direction += this.axisMapping[code];
-                    if (code != "KeyK")
-                        this.keys[code] = true;
+                    this.startJump();
+                    this.keys[code] = true;
                 }
+                return;
             }
+            this.direction += this.axisMapping[code];
+            this.keys[code] = true;
             
         });
         window.addEventListener("keyup", (e) => {
             if (e.code == "ShiftLeft" && !this.dashing)
             {
-                if (this.maxV.x != this.walkingSpeed)
-                    this.maxV.x = this.walkingSpeed;
-
-                if (this.sprintCounter <= 12 && this.sprintCounter != 0 && this.canDash && this.dashCooldown == 0)
-                {
-                    this.maxV.x = 96;
-                    this.speed = 64;
-                    this.dashTimer = 0;
-                    this.dashing = true;
-
-                    this.v.y = 0;
-                    this.gravityMultiplier = 0;
-
-                    this.canDash = false;
-                    this.dashCooldown = 16;
-                }
-                this.sprintCounter = 0;
+                this.runStop();
+                this.startDash();
                 this.shifting = false;
-            }
-
+            } //
             const code = this.convertKeys(e.code);
             if (code != "urmom" && this.keys[code])
             {
@@ -292,44 +259,115 @@ class Player extends Physics
         });
     }
 
-    updateMovement()
+    run()
     {
-        if (this.keys["KeyK"]&&this.jumping)
+        if (this.direction != 0 && this.maxV.x != this.runningSpeed)
+            this.maxV.x = this.runningSpeed;
+    }
+    runStop()
+    {
+        if (this.maxV.x != this.walkingSpeed)
+            this.maxV.x = this.walkingSpeed;
+    }
+
+    startDash()
+    {
+        if (this.sprintCounter <= 12 && this.sprintCounter != 0 && this.canDash && this.dashCooldown == 0)
+        {
+            this.maxV.x = 96;
+            this.speed = 64;
+            this.dashTimer = 0;
+            this.dashing = true;
+
+            this.v.y = 0;
+            this.gravityMultiplier = 0;
+
+            this.canDash = false;
+            this.dashCooldown = 16;
+        }
+        this.sprintCounter = 0;
+    }
+    dash()
+    {
+        this.v.x += this.frozenDirection * this.speed;
+        if (Math.abs(this.v.x) > this.maxV.x)
+            this.v.x = Math.sign(this.v.x) * this.maxV.x;
+    }
+    stopDash()
+    {
+        this.speed = this.acceleration;
+        this.maxV.x = this.walkingSpeed;
+        this.dashing = false;
+    }
+
+    startJump()
+    {
+        this.jumping = true;
+        this.v.y = this.jumpSteps < 2 ? this.jumpStrength : 0;
+    }
+    jump()
+    {
+        this.v.y += this.jumpStrength/this.jumpSteps + (Math.min(this.maxV.x,8)-this.walkingSpeed)/6;
+        this.jumpStepsLeft--;
+    }
+
+    updateCounters()
+    {
+        // Jumping
+        if (this.keys["KeyK"] && this.jumping)
         {
             this.jumpCounter--;
         }
         if (this.jumpCounter < this.jumpStepsLeft && this.jumpCounter >= 0)
-        {
-            this.v.y += this.jumpStrength/this.jumpSteps + (Math.min(this.maxV.x,8)-this.walkingSpeed)/6;
-            this.jumpStepsLeft--;
-        }
+            this.jump();
+
+        // Sprinting
         if (this.shifting)
             this.sprintCounter++;
-
-        if (this.dashCooldown > 0)
-            this.dashCooldown--;
-        if (!this.grounded)
-            this.dashCooldown = 0;
 
         if (this.sprintCounter > 32)
         {
             this.maxV.x = this.sprintSpeed;
         }
 
+        // Dash
+        if (this.dashCooldown > 0)
+            this.dashCooldown--;
+        if (!this.grounded)
+            this.dashCooldown = 0;
+    }
+
+    updateMiscPhysics()
+    {
+        // x speed cap
+        if (Math.abs(this.v.x) > this.maxV.x)
+            this.v.x = Math.sign(this.v.x) * this.maxV.x;
+
+        // Deceleration grounded/falling
+        if (this.v.x != 0 && (this.grounded || !this.jumping))
+        {
+            this.v.x = this.v.x > 0 ? Math.floor(this.v.x - this.v.x/8) : Math.ceil(this.v.x - this.v.x/8);
+            return;
+        }
+
+        // Jumping
+        if (this.v.x != 0 && !this.grounded && this.jumping)
+            this.v.x = this.v.x > 0 ? this.v.x-0.1 : this.v.x+0.1;
+    }
+
+    updateMovement()
+    {
+        this.updateCounters();
+
         if (this.dashTimer < this.dashDuration)
         {
+            this.dash();
             this.dashTimer++;
-
-            this.v.x += this.frozenDirection * this.speed;
-            if (Math.abs(this.v.x) > this.maxV.x)
-                this.v.x = Math.sign(this.v.x) * this.maxV.x;
             return;
         }
         else if (this.dashing)
         {
-            this.speed = this.acceleration;
-            this.maxV.x = this.walkingSpeed;
-            this.dashing = false;
+            this.stopDash();
             return;
         }
         if (this.gravityMultiplier < 1)
@@ -346,28 +384,15 @@ class Player extends Physics
             return;
         }
         
-        if (Math.abs(this.v.x) > this.maxV.x)
-            this.v.x = Math.sign(this.v.x) * this.maxV.x;
-        if (this.v.x != 0 && (this.grounded || !this.jumping))
-        {
-            this.v.x = this.v.x > 0 ? Math.floor(this.v.x - this.v.x/8) : Math.ceil(this.v.x - this.v.x/8);
-            return;
-        }
-        if (this.v.x != 0 && !this.grounded && this.jumping)
-            this.v.x = this.v.x > 0 ? this.v.x-0.1 : this.v.x+0.1;
+        this.updateMiscPhysics();
     }
     
     collideTop({x,y,w,h,o})
     {
         const _o = this.t.h * this.t.o.y;
-
-        const _x = this.t.x + this.t.w * this.t.o.x;
-        const _y = this.t.y + _o;
-
+        const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
         const oldy = this.oldt.y + _o;
-        
-        const __x = x + w * o.x;
-        const __y = y + h * o.y;
+        const __x = x + w * o.x, __y = y + h * o.y;
 
         if (_x+this.t.w >= __x   &&
             _x          <= __x+w &&
@@ -384,15 +409,10 @@ class Player extends Physics
     collideBottom({x,y,w,h,o})
     {
         const _o = this.t.h * this.t.o.y;
-
-        const _x = this.t.x + this.t.w * this.t.o.x;
-        const _y = this.t.y + _o;
-
+        const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
         const oldy = this.oldt.y + _o;
+        const __x = x + w * o.x, __y = y + h * o.y;
         
-        const __x = x + w * o.x;
-        const __y = y + h * o.y;
-
         if (_x+this.t.w   >= __x   &&
             _x            <= __x+w &&
             _y+this.t.h   >= __y   &&
@@ -414,14 +434,9 @@ class Player extends Physics
     collideLeft({x,y,w,h,o})
     {
         const _o = this.t.w * this.t.o.x;
-
-        const _x = this.t.x + _o;
-        const _y = this.t.y + this.t.h * this.t.o.y;
-
+        const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
         const oldx = this.oldt.x + _o;
-        
-        const __x = x + w * o.x;
-        const __y = y + h * o.y;
+        const __x = x + w * o.x, __y = y + h * o.y;
 
         if (_x          <= __x+w &&
             oldx        >= __x+w &&
@@ -438,14 +453,9 @@ class Player extends Physics
     collideRight({x,y,w,h,o})
     {
         const _o = this.t.w * this.t.o.x;
-
-        const _x = this.t.x + _o;
-        const _y = this.t.y + this.t.h * this.t.o.y;
-
+        const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
         const oldx = this.oldt.x + _o;
-        
-        const __x = x + w * o.x;
-        const __y = y + h * o.y;
+        const __x = x + w * o.x, __y = y + h * o.y;
 
         if (_x+this.t.w   >= __x   &&
             oldx+this.t.w <= __x   &&
