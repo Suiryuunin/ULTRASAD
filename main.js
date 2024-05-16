@@ -55,6 +55,8 @@ const update = () =>
                 break;
         }
     }
+
+    PLAYER.lateUpdate();
 };
 const render = () =>
 {

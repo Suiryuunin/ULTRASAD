@@ -56,15 +56,29 @@ class Display
         ctx.globalAlpha = 1;
     }
 
-    drawImg(ctx, {x, y, w, h, o}, img, alpha = 1)
+    drawImg(ctx, {x, y, w, h, o}, img, alpha = 1, r = 0)
     {
         ctx.globalAlpha = alpha;
-        if (o != undefined)
+        if (o != undefined && r == 0)
         {
-          x += w * o.x;
-          y += h * o.y;
+            x += w * o.x;
+            y += h * o.y;
         }
-        ctx.drawImage(img, x, y, w, h);
+        if (r == 0)
+        {
+            ctx.drawImage(img, x, y, w, h);
+            return;
+        }
+        
+        ctx.save();
+
+        ctx.translate(x, y);
+        ctx.rotate(r * Math.PI / 180);
+
+        ctx.drawImage(img, w * o.x, h * o.y, w, h);
+
+        // restore the context to its untranslated/unrotated state
+        ctx.restore();
     }
 
     drawRect(ctx, {x, y, w, h, o}, color = this.color, alpha = 1, content = "fill", thickness = 1)
