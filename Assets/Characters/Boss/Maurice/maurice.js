@@ -21,7 +21,7 @@ class Maurice extends Dynamic
         this.bulletCooldownTime = this.bulletCooldown = 4;
         this.bulletDuration = 32;
         this.bulletDurationTime = 0;
-        this.cooldown = 32;
+        this.cooldown = 64;
         this.cooling = 0;
         this.chargeTime = this.charging = 16;
         this.bullets = [];
@@ -45,7 +45,6 @@ class Maurice extends Dynamic
             {
                 this.bulletCooldown = 0;
                 this.bullets.push(new Bullet(this.t, "red", _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}));
-                console.log(this.bullets[0].t.x)
             }
             else
             {

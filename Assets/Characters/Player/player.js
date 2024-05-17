@@ -5,6 +5,12 @@ class Sword extends Dynamic
         super("img", player.t, c, _NOCOLLISION)
 
         this.directionY = 0;
+        this.directionDuration = 20;
+        this.directionTime =
+        {
+            "KeyW": this.directionDuration,
+            "KeyS": this.directionDuration
+        };
         this.directions =
         {
             "KeyW": -1,
@@ -17,10 +23,32 @@ class Sword extends Dynamic
         };
 
         this.player = player;
+
+        this.stabbing = false;
+        this.stabbingTime = this.stabbingTimeLeft = 4;
+        this.stabCooldown = this.stabCooling = 8;
+        this.stabStep = {x:0,y:0};
+        this.justStoppedStabbing = false;
+        this.chargingStab = false;
+        this.maxStabCharge = 32;
+        this.stabCharge = 0;
+
         this.t.w = 16;
         this.t.h = 128;
         this.t.o = {x:-0.5,y:-1};
         this.r = 70;
+        this.destination = this.st = this.t;
+
+        const SwordAuraImg = new Image();
+        SwordAuraImg.src = "Assets/Characters/Player/swordAura.png";
+        this.swordAura = new Img(
+            {
+            x:this.t.x,
+            y:this.t.y,
+            w:SwordAuraImg.width,
+            h:SwordAuraImg.height,
+            o:this.st.o
+        }, SwordAuraImg);
 
         window.addEventListener(("keydown"), (e) =>
         {
@@ -30,12 +58,20 @@ class Sword extends Dynamic
 
             if (e.code == "KeyJ")
             {
-                this.chargingStab = true;
+                if (this.stabCooldown == this.stabCooling)
+                {
+                    this.t.o = this.st.o = {x:-0.5, y:0};
+                    this.chargingStab = true;
+                    return;
+                }
+                this.keys[e.code] = false;
                 return;
             }
 
             if (this.directions[e.code] != undefined)
             {
+                if (this.directionTime[e.code] == this.directionDuration)
+                    this.directionTime[e.code] = 0;
                 this.directionY += this.directions[e.code];
             }
         });
@@ -48,29 +84,161 @@ class Sword extends Dynamic
 
             if (e.code == "KeyJ")
             {
-                this.stab();
+                if (this.stabCooldown == this.stabCooling)
+                    this.stab();
                 return;
             }
 
             if (this.directions[e.code] != undefined)
             {
                 this.directionY -= this.directions[e.code];
+                this.directionTime[e.code] = this.directionDuration;
             }
         });
     }
 
+    charge()
+    {
+        if (this.stabCharge < this.maxStabCharge)
+            this.stabCharge++;
+
+        this.r = -this.player.frozenDirection * 80;
+        this.t.x = this.player.center.x + -this.player.frozenDirection * 48;
+        this.t.y = this.player.t.y - 16;
+    }
+
     stab()
     {
-        console.log(this.directionY == 0 ? this.player.frozenDirection : this.directionY);
+        this.stabbing = true;
+        this.chargingStab = false;
+        this.stabCooling = 0;
+        this.stabbingTimeLeft = 0;
+        
+        if (this.directionY == 0)
+        {
+            let ox = -1; 
+            if (this.player.frozenDirection > 0)
+                ox = 0;
+            this.destination =
+            {
+                x: this.player.center.x + this.player.frozenDirection * 48,
+                y: this.player.center.y,
+                w: 128,
+                h: 16,
+                o: {x:ox,y:-0.5}
+            }
+            this.st.o.y = 0;
+            this.r = 90*-this.player.frozenDirection;
+            return;
+        }
+
+        let oy = -1; 
+        if (this.directionY > 0)
+            oy = 0;
+        this.destination =
+        {
+            x: this.player.center.x,
+            y: this.player.center.y + this.directionY * 64,
+            w: 16,
+            h: 128,
+            o: {x:-0.5,y:oy}
+        }
+        this.st.o.y = 0;
+        this.r = oy*180;
+    }
+
+    keyDuration()
+    {
+        if (this.directionTime["KeyW"] < this.directionDuration)
+        {
+            this.directionTime["KeyW"]++;
+            if (this.directionTime["KeyW"] == this.directionDuration)
+            {
+                this.keys["KeyW"] = false;
+                this.directionY -= this.directions["KeyW"];
+            }
+        }
+        if (this.directionTime["KeyS"] < this.directionDuration)
+        {
+            this.directionTime["KeyS"]++;
+            if (this.directionTime["KeyS"] == this.directionDuration)
+            {
+                this.keys["KeyS"] = false;
+                this.directionY -= this.directions["KeyS"];
+            }
+        }
     }
 
     update()
     {
         this.setOldTransform();
 
-        this.t.x = this.player.t.x + this.player.frozenDirection * 42;
-        this.r = -this.player.frozenDirection * 110;
-        this.t.y = this.player.t.y + 24;
+        this.keyDuration();
+
+        if (this.chargingStab)
+        {
+            this.charge();
+            return;
+        }
+
+        if (this.stabCooling < this.stabCooldown && this.stabbingTimeLeft == this.stabbingTime)
+            this.stabCooling++;
+
+        if (this.stabbing)
+        {
+            this.t.x = this.player.center.x;
+            this.t.y = this.player.center.y;
+            this.stabStep = {x:(this.destination.x-this.t.x)/this.stabbingTime,y:(this.destination.y-this.t.y)/this.stabbingTime}
+            this.t = this.destination;
+            this.stabbing = false;
+            return;
+        }
+        if (this.stabbingTimeLeft < this.stabbingTime)
+        {
+            this.stabbingTimeLeft++;
+            this.moveBy(this.stabStep);
+            if (this.stabbingTimeLeft == this.stabbingTime)
+            {
+                this.justStoppedStabbing = true;
+            }
+            return;
+        }
+        if (this.justStoppedStabbing)
+        {
+            this.t.w = 16;
+            this.t.h = 128;
+            this.t.o = this.st.o = {x:-0.5,y:-1};
+            this.justStoppedStabbing = false;
+        }
+        this.r = this.player.frozenDirection * 70;
+        this.t.x = this.player.t.x + -this.player.frozenDirection * 64;
+        this.t.y = this.player.t.y + 64;
+    }
+    render()
+    {
+        this.swordAura.t =
+        {
+            x:this.t.x,
+            y:this.t.y,
+            w:this.swordAura.t.w,
+            h:this.swordAura.t.h,
+            o:this.st.o
+        };
+
+        if (this.stabbingTimeLeft < this.stabbingTime)
+            display.drawImg(currentCtx,this.swordAura.t, this.swordAura.c, 0.8, this.r);
+
+        display.drawImg(currentCtx,
+        {
+            x:this.t.x,
+            y:this.t.y,
+            w:this.st.w,
+            h:this.st.h,
+            o:this.st.o
+        }, this.c, 1, this.r);
+
+        if (this.renderMore != undefined)
+            this.renderMore();
     }
 }
 
@@ -81,7 +249,9 @@ class Player extends Physics
         super(type, {x,y,w,h,o}, c, _NOCOLLISION);
 
         this.player = true;
-        this.sword = new Sword(this, this.c);
+        const swordIMG = new Image();
+        swordIMG.src = "Assets/Characters/Player/sword.png";
+        this.sword = new Sword(this, swordIMG);
 
         this.center = {x:0,y:0};
         
@@ -299,90 +469,33 @@ class Player extends Physics
         this.updateMiscPhysics();
     }
     
-    collideTop({x,y,w,h,o})
+    collideTopA({y,h,o})
     {
-        const _o = this.t.h * this.t.o.y;
-        const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
-        const oldy = this.oldt.y + _o;
-        const __x = x + w * o.x, __y = y + h * o.y;
-
-        if (_x+this.t.w >= __x   &&
-            _x          <= __x+w &&
-            _y          <= __y+h &&
-            oldy        >= __y+h)
-        {
-            this.v.y = 0;
-            this.t.y = __y+h - _o;
-            return true;
-        }
-        
-        return false;
+        this.v.y = 0;
+        this.t.y = (y + h * o.y)+h - this.t.h*this.t.o.y;
     }
-    collideBottom({x,y,w,h,o})
+    collideBottomA({y,h,o})
     {
-        const _o = this.t.h * this.t.o.y;
-        const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
-        const oldy = this.oldt.y + _o;
-        const __x = x + w * o.x, __y = y + h * o.y;
+        this.v.y = 0;
+        this.t.y = (y + h * o.y)+this.t.h*this.t.o.y;
+        this.grounded = true;
         
-        if (_x+this.t.w   >= __x   &&
-            _x            <= __x+w &&
-            _y+this.t.h   >= __y   &&
-            oldy+this.t.h <= __y)
-        {
-            this.v.y = 0;
-            this.t.y = __y+_o;
-            this.grounded = true;
-            
-            this.canDash = true;
+        this.canDash = true;
 
-            this.jumping = false;
-            this.jumpCounter = this.jumpSteps;
-            this.jumpStepsLeft = this.jumpSteps;
-            this.airJumpsLeft = this.maxAirJump;
-            return true;
-        }
-        
-        this.grounded = false;
-        return false;
+        this.jumping = false;
+        this.jumpCounter = this.jumpSteps;
+        this.jumpStepsLeft = this.jumpSteps;
+        this.airJumpsLeft = this.maxAirJump;
     }
-    collideLeft({x,y,w,h,o})
+    collideLeftA({x,w,o})
     {
-        const _o = this.t.w * this.t.o.x;
-        const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
-        const oldx = this.oldt.x + _o;
-        const __x = x + w * o.x, __y = y + h * o.y;
-
-        if (_x          <= __x+w &&
-            oldx        >= __x+w &&
-            _y+this.t.h >= __y   &&
-            _y          <= __y+h)
-        {
-            this.v.x = 0;
-            this.t.x = __x+w - _o+0.01;
-            return true;
-        }
-        
-        return false;
+        this.v.x = 0;
+        this.t.x = (x + w * o.x)+w - this.t.w*this.t.o.x+0.01;
     }
-    collideRight({x,y,w,h,o})
+    collideRightA({x,w,o})
     {
-        const _o = this.t.w * this.t.o.x;
-        const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
-        const oldx = this.oldt.x + _o;
-        const __x = x + w * o.x, __y = y + h * o.y;
-
-        if (_x+this.t.w   >= __x   &&
-            oldx+this.t.w <= __x   &&
-            _y+this.t.h   >= __y   &&
-            _y            <= __y+h)
-        {
-            this.v.x = 0;
-            this.t.x = __x - this.t.w - _o-0.01;
-            return true;
-        }
-        
-        return false;
+        this.v.x = 0;
+        this.t.x = (x + w * o.x) - this.t.w - this.t.w*this.t.o.x-0.01;
     }
 
     Death()
@@ -398,6 +511,6 @@ class Player extends Physics
 
     renderMore()
     {
-        display.drawImg(currentCtx, this.sword.t, this.sword.c, 1, this.sword.r);
+        this.sword.render();
     }
 }

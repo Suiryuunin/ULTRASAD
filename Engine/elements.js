@@ -127,9 +127,8 @@ class Dynamic extends Rect
         this.t.x = x;
         this.t.y = y;
     }
-    moveBy({x,y}, d)
+    moveBy({x,y}, d=1)
     {
-        console.log(x)
         this.t.x += x*d;
         this.t.y += y*d;
     }
@@ -170,6 +169,84 @@ class Dynamic extends Rect
         
         this.t.y -= this.v.y;
         this.t.x += this.v.x;
+    }
+
+    collideTop({x,y,w,h,o})
+    {
+        const _o = this.t.h * this.t.o.y;
+        const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
+        const oldy = this.oldt.y + _o;
+        const __x = x + w * o.x, __y = y + h * o.y;
+
+        if (_x+this.t.w >= __x   &&
+            _x          <= __x+w &&
+            _y          <= __y+h &&
+            oldy        >= __y+h)
+        {
+            if (this.collideTopA != undefined)
+                this.collideTopA({x,y,w,h,o});
+            return true;
+        }
+        
+        return false;
+    }
+    collideBottom({x,y,w,h,o})
+    {
+        const _o = this.t.h * this.t.o.y;
+        const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
+        const oldy = this.oldt.y + _o;
+        const __x = x + w * o.x, __y = y + h * o.y;
+        
+        if (_x+this.t.w   >= __x   &&
+            _x            <= __x+w &&
+            _y+this.t.h   >= __y   &&
+            oldy+this.t.h <= __y)
+        {
+            if (this.collideBottomA != undefined)
+                this.collideBottomA({x,y,w,h,o});
+            return true;
+        }
+        
+        this.grounded = false;
+        return false;
+    }
+    collideLeft({x,y,w,h,o})
+    {
+        const _o = this.t.w * this.t.o.x;
+        const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
+        const oldx = this.oldt.x + _o;
+        const __x = x + w * o.x, __y = y + h * o.y;
+
+        if (_x          <= __x+w &&
+            oldx        >= __x+w &&
+            _y+this.t.h >= __y   &&
+            _y          <= __y+h)
+        {
+            if (this.collideLeftA != undefined)
+                this.collideLeftA({x,y,w,h,o});
+            return true;
+        }
+        
+        return false;
+    }
+    collideRight({x,y,w,h,o})
+    {
+        const _o = this.t.w * this.t.o.x;
+        const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
+        const oldx = this.oldt.x + _o;
+        const __x = x + w * o.x, __y = y + h * o.y;
+
+        if (_x+this.t.w   >= __x   &&
+            oldx+this.t.w <= __x   &&
+            _y+this.t.h   >= __y   &&
+            _y            <= __y+h)
+        {
+            if (this.collideRightA != undefined)
+                this.collideRightA({x,y,w,h,o});
+            return true;
+        }
+        
+        return false;
     }
 }
 
