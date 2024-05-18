@@ -13,6 +13,10 @@ class Rect
         this.active = true;
         this.collision = collision;
 
+        this.flip = {x:1,y:1};
+        this.r = 0;
+        this.alpha = 1;
+
         if (this.type == "ani")
         {
             this.frameSet = [];
@@ -97,13 +101,13 @@ class Rect
 
             case "img":
             {
-                display.drawImg(currentCtx, this.t, this.c);
+                display.drawImg(currentCtx, this.t, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
                 break;
             }
 
             case "ani":
             {
-                display.drawImg(currentCtx, this.t, this.frameSet[this.frame]);
+                display.drawImg(currentCtx, this.t, this.frameSet[this.frame], this.alpha, this.r, this.flip.x, this.flip.y);
                 this.frame = (this.frame+1)%this.frameSet.length;
                 break;
             }

@@ -59,6 +59,7 @@ class Sword extends Dynamic
             frames.push(cP+i+".png");
         }
         this.chargeAni = [new Rect("ani", this.t, frames, _NOCOLLISION), new Rect("ani", this.t, frames, _NOCOLLISION, 2),new Rect("ani", this.t, frames, _NOCOLLISION,5)];
+        this.chargeConcentration = 1;
 
         window.addEventListener(("keydown"), (e) =>
         {
@@ -110,19 +111,25 @@ class Sword extends Dynamic
     charge()
     {
         if (this.stabCharge < this.maxStabCharge)
+        {
             this.stabCharge++;
+            this.chargeConcentration = Math.floor(this.stabCharge/(this.maxStabCharge/this.chargeAni.length));
+            if (this.chargeConcentration < 1) this.chargeConcentration = 1;
+        }
 
         this.r = -this.player.frozenDirection * 80;
-        this.t.x = this.player.center.x + -this.player.frozenDirection * 48;
-        this.t.y = this.player.t.y - 16;
+        this.t.x = this.player.center.x + -this.player.frozenDirection * 48 + ((Math.random()-0.5)*this.stabCharge/16);
+        this.t.y = this.player.t.y - 16 + ((Math.random()-0.5)*this.stabCharge/16);
 
-        for (const chargeA of this.chargeAni)
+        this.flip.x = this.player.frozenDirection;
+
+        for (let i = 0; i < this.chargeConcentration; i++)
         {
-            chargeA.t = this.t;
-            chargeA.t =
+            this.chargeAni[i].flip.x = this.player.frozenDirection;
+            this.chargeAni[i].t =
             {
-                x:this.t.x + this.player.frozenDirection * 32,
-                y:this.t.y,
+                x:this.t.x + this.player.frozenDirection * 32 + ((Math.random()-0.5)*this.stabCharge/8),
+                y:this.t.y + ((Math.random()-0.5)*this.stabCharge/8),
                 w:128,
                 h:128,
                 o:{x:-0.5,y:-0.5}
@@ -266,8 +273,8 @@ class Sword extends Dynamic
 
         if (this.chargingStab)
         {
-            for (const chargeA of this.chargeAni)
-                chargeA.render();
+            for (let i = 0; i < this.chargeConcentration; i++)
+                this.chargeAni[i].render();
         }
 
         if (this.renderMore != undefined)

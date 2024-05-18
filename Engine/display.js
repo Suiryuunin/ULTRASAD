@@ -56,15 +56,15 @@ class Display
         ctx.globalAlpha = 1;
     }
 
-    drawImg(ctx, {x, y, w, h, o}, img, alpha = 1, r = 0)
+    drawImg(ctx, {x, y, w, h, o}, img, alpha = 1, r = 0, sx=1,sy=1)
     {
         ctx.globalAlpha = alpha;
-        if (o != undefined && r == 0)
+        if (o != undefined && r == 0 && sx == 1 && sy == 1)
         {
             x += w * o.x;
             y += h * o.y;
         }
-        if (r == 0)
+        if (r == 0 && sx == 1 && sy == 1)
         {
             ctx.drawImage(img, x, y, w, h);
             return;
@@ -72,8 +72,16 @@ class Display
         
         ctx.save();
 
-        ctx.translate(x, y);
-        ctx.rotate(r * Math.PI / 180);
+        if (r != 0)
+        {
+            ctx.translate(x, y);
+            ctx.rotate(r * Math.PI / 180);
+        }
+        if (sx != 1 || sy != 1)
+        {
+            ctx.translate(x, y);
+            ctx.scale(sx,sy);
+        }
 
         ctx.drawImage(img, w * o.x, h * o.y, w, h);
 
