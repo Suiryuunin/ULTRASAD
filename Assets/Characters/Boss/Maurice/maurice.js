@@ -1,35 +1,30 @@
+const BulletIMG = new Image();
+BulletIMG.src = "Assets/Characters/Boss/Maurice/Textures/bullet.png";
+
 class Bullet extends Dynamic
 {
     constructor({x,y,w,h,o}, c, collision = _BLOCKALL, target, boss)
     {
-        super("color", {x,y,w,h,o}, c, collision);
+        super("img", {x,y,w,h,o}, c, collision);
 
         this.target = target;
         this.boss = boss;
         this.dying = false;
         this.deathCountDown = 4;
         this.t.w = this.t.h = 48;
+        this.speed = 16;
+        this.r = 0;
         this.setDirectionTo({x:target.x, y:target.y});
+        this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
     }
 
-    collideTopA({y,h,o})
+    circleRectA({x,y}, d)
     {
-        this.t.y = (y+h*o.y)+h - this.t.h*this.t.o.y;
-        this.dying = true;
-    }
-    collideBottomA({y,h,o})
-    {
-        this.t.y = (y +h*o.y)+this.t.h*this.t.o.y;
-        this.dying = true;
-    }
-    collideLeftA({x,w,o})
-    {
-        this.t.x = (x+w*o.x)+w - this.t.w*this.t.o.x+0.01;
-        this.dying = true;
-    }
-    collideRightA({x,w,o})
-    {
-        this.t.x = (x+w*o.x) - this.t.w - this.t.w*this.t.o.x-0.01;
+        const m = d/(d-this.t.w/2);
+        x/=m;
+        y/=m;
+        this.t.x = (this.center.x-x)+this.t.w*this.t.o.x+this.t.w/2;
+        this.t.y = (this.center.y-y)+this.t.h*this.t.o.y+this.t.h/2;
         this.dying = true;
     }
 
@@ -47,7 +42,14 @@ class Bullet extends Dynamic
             return;
         }
         
-        this.moveBy(this.direction, 16);
+        this.moveBy(this.direction, this.speed);
+        this.r = (this.r+30)%360;
+        this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+    }
+
+    render()
+    {
+        display.drawImg(currentCtx, this.t, this.c, 1, this.r);
     }
 }
 
@@ -92,7 +94,7 @@ class Maurice extends Dynamic
             if (this.bulletCooldown == this.bulletCooldownTime)
             {
                 this.bulletCooldown = 0;
-                this.bullets.push(new Bullet(this.t, "red", _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
+                this.bullets.push(new Bullet(this.t, BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
             }
             else
             {

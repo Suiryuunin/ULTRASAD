@@ -53,13 +53,30 @@ class Rect
         return {l:l,r:r,t:t,b:b};
     }
 
-    updateCollision({l,r,t,b}, exception = undefined)
+    checkCRCollision(e)
     {
-        if (exception != undefined)
+        if (this.collision != _NOCOLLISION)
+        return e.circleRect(this.t);
+    }
+
+    updateCollision({l,r,t,b}, type = "rect/rect", exception = undefined)
+    {
+        if (type == "rect/rect")
         {
-            return this.checkCollision({l,r,t,b}, exception);
+            if (exception != undefined)
+            {
+                return this.checkCollision({l,r,t,b}, exception);
+            }
+            return this.checkCollision({l,r,t,b}, PLAYER);
         }
-        return this.checkCollision({l,r,t,b}, PLAYER);
+        if (type == "circle/rect")
+        {
+            if (exception != undefined)
+            {
+                return this.checkCRCollision(exception);
+            }
+            return this.checkCRCollision(PLAYER);
+        }
     }
 
     update()
@@ -214,6 +231,36 @@ class Dynamic extends Rect
 
         if (this.updateMore != undefined)
             this.updateMore();
+    }
+
+    circleRect({x,y,w,h,o}) {
+
+        const rx = x + w * o.x, ry = y + h * o.y;
+
+        const cx = this.center.x, cy = this.center.y;
+        
+        let testX = cx;
+        let testY = cy;
+      
+        // which edge is closest?
+        if (cx < rx)        {testX = rx;  }    // test left edge
+        else if (cx > rx+w) {testX = rx+w;}   // right edge
+        if (cy < ry)        {testY = ry;  }    // top edge
+        else if (cy > ry+h) {testY = ry+h;}   // bottom edge
+      
+        // get distance from closest edges
+        const distX = cx-testX;
+        const distY = cy-testY;
+        const distance = Math.sqrt(distX**2+distY**2);
+      
+        // if the distance is less than the radius, collision!
+        if (distance <= this.t.w/2)
+        {
+            if (this.circleRectA != undefined)
+                this.circleRectA({x:distX, y:distY}, distance);
+            return true;
+        }
+        return false;
     }
 
     collideTop({x,y,w,h,o})

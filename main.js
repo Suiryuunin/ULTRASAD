@@ -50,8 +50,9 @@ const update = () =>
                 colliding = element.updateCollision(colliding);
             }
             
+            if (!element.boss)
             for (const bullet of currentCtx.boss[0].bullets)
-                element.updateCollision({l:false,r:false,t:false,b:false}, bullet);
+                element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
         }
     }
 
