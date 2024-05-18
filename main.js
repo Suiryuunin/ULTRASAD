@@ -56,6 +56,12 @@ const update = () =>
         }
     }
 
+    for (const bullet of currentCtx.boss[0].bullets)
+    {
+        if (PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet) && !PLAYER.shield)
+            PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
+    }
+
     PLAYER.lateUpdate();
 };
 const render = () =>
@@ -88,6 +94,11 @@ const render = () =>
         {
             element.render();
         }
+    }
+
+    for (const element of FOREGROUNDQUEUE)
+    {
+        element.render();
     }
 
     display.render();

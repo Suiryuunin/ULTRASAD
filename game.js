@@ -18,6 +18,7 @@ function toCanvasCoords(pageX, pageY)
 
     return {x, y};
 }
+const FOREGROUNDQUEUE = [];
 const playerIMG = new Image(64, 128);
 playerIMG.src = "Assets/Textures/bg720p.jpg";
 const PLAYER = new Player("img", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},playerIMG);

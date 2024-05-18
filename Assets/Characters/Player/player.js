@@ -73,6 +73,7 @@ class Sword extends Dynamic
                 {
                     this.t.o = this.st.o = {x:-0.5, y:0};
                     this.chargingStab = true;
+                    this.player.shield = true;
                     return;
                 }
                 this.keys[e.code] = false;
@@ -145,6 +146,7 @@ class Sword extends Dynamic
         this.stabCooling = 0;
         this.stabbingTimeLeft = 0;
         this.swordAura.t.h += this.stabCharge/this.maxStabCharge*this.swordAura.t.h;
+        this.player.shield = false;
         
         if (this.directionY == 0)
         {
@@ -293,7 +295,21 @@ class Player extends Physics
         swordIMG.src = "Assets/Characters/Player/sword.png";
         this.sword = new Sword(this, swordIMG);
 
+        this.bullets = [];
+
         this.center = {x:0,y:0};
+
+        this.radius = 112;
+
+        this.shield = false;
+
+        const sP = "Assets/Characters/Player/Shield/shield000";
+        const frames = [];
+        for (let i = 0; i < 6; i++)
+        {
+            frames.push(sP+i+".png");
+        }
+        this.shieldAni = new Rect("ani", this.t, [frames], _NOCOLLISION);
         
         // Movements
         this.direction = 0;
@@ -334,7 +350,8 @@ class Player extends Physics
             return "urmom";
         }
 
-        window.addEventListener("keydown", (e) => {
+        window.addEventListener("keydown", (e) =>
+        {
             if (e.code == "ShiftLeft" && !this.dashing)
             {
                 this.run();
@@ -362,7 +379,8 @@ class Player extends Physics
             this.keys[code] = true;
             
         });
-        window.addEventListener("keyup", (e) => {
+        window.addEventListener("keyup", (e) =>
+        {
             if (e.code == "ShiftLeft" && !this.dashing)
             {
                 this.runStop();
@@ -547,10 +565,17 @@ class Player extends Physics
     {
         this.sword.update();
         this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+
+        for (const bullet of this.bullets)
+        {
+            bullet.update();
+        }
     }
 
     renderMore()
     {
         this.sword.render();
+        if (this.shield)
+            this.shieldAni.render();
     }
 }

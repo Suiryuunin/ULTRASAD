@@ -59,8 +59,13 @@ class Rect
 
     checkCRCollision(e)
     {
-        if (this.collision != _NOCOLLISION)
-        return e.circleRect(this.t);
+        if (this.collision != _NOCOLLISION || this.player)
+            return e.circleRect(this.t);
+    }
+    checkCCCollision(e)
+    {
+        if (this.player)
+            return e.circleCircle({x:this.center.x,y:this.center.y}, this.radius);
     }
 
     updateCollision({l,r,t,b}, type = "rect/rect", exception = undefined)
@@ -78,6 +83,14 @@ class Rect
             if (exception != undefined)
             {
                 return this.checkCRCollision(exception);
+            }
+            return this.checkCRCollision(PLAYER);
+        }
+        if (type == "circle/circle")
+        {
+            if (exception != undefined)
+            {
+                return this.checkCCCollision(exception);
             }
             return this.checkCRCollision(PLAYER);
         }
@@ -237,8 +250,8 @@ class Dynamic extends Rect
             this.updateMore();
     }
 
-    circleRect({x,y,w,h,o}) {
-
+    circleRect({x,y,w,h,o})
+    {
         const rx = x + w * o.x, ry = y + h * o.y;
 
         const cx = this.center.x, cy = this.center.y;
@@ -262,6 +275,26 @@ class Dynamic extends Rect
         {
             if (this.circleRectA != undefined)
                 this.circleRectA({x:distX, y:distY}, distance);
+
+            return true;
+        }
+        return false;
+    }
+
+    circleCircle({x,y}, r)
+    {
+
+        const cx = this.center.x, cy = this.center.y;
+
+        const distX = cx-x;
+        const distY = y-cy;
+        const distance = Math.sqrt(distX**2+distY**2);
+
+        if (distance <= (r+this.t.w/2))
+        {
+            if (this.circleCircleA != undefined)
+                this.circleCircleA({x:distX,y:distY}, distance, r);
+
             return true;
         }
         return false;
