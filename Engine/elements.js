@@ -1,6 +1,6 @@
 class Rect
 {
-    constructor(type = "none", {x,y,w,h,o}, c, collision = _BLOCKALL)
+    constructor(type = "none", {x,y,w,h,o}, c, collision = _BLOCKALL, initFrame = 0)
     {
         this.type = type;
         this.name = "nameless";
@@ -12,25 +12,60 @@ class Rect
         this.visible = true;
         this.active = true;
         this.collision = collision;
+
+        if (this.type == "ani")
+        {
+            this.frameSet = [];
+            for (const f of this.c)
+            {
+                const TEMPIMG = new Image();
+                TEMPIMG.src = f;
+                this.frameSet.push(TEMPIMG);
+            }
+            this.frame = initFrame;
+        }
     }
 
-    updateCollision({l,r,t,b})
+    updateFrameSet(frames)
+    {
+        this.frameSet = [];
+
+        for (const f of frames)
+        {
+            const TEMPIMG = new Image();
+            TEMPIMG.src = f;
+            this.frameSet.push(f);
+        }
+        this.frame = 0;
+    }
+    
+    checkCollision({l,r,t,b}, e)
     {
         if (this.collision.r && !l)
-            t = PLAYER.collideLeft(this.t);
+            l = e.collideLeft(this.t);
         if (this.collision.l && !r)
-            t = PLAYER.collideRight(this.t);
+            r = e.collideRight(this.t);
         if (this.collision.b && !t)
-            t = PLAYER.collideTop(this.t);
+            t = e.collideTop(this.t);
         if (this.collision.t && !b)
-            b = PLAYER.collideBottom(this.t);
+            b = e.collideBottom(this.t);
 
         return {l:l,r:r,t:t,b:b};
     }
 
+    updateCollision({l,r,t,b}, exception = undefined)
+    {
+        if (exception != undefined)
+        {
+            return this.checkCollision({l,r,t,b}, exception);
+        }
+        return this.checkCollision({l,r,t,b}, PLAYER);
+    }
+
     update()
     {
-
+        if (this.updateMore != undefined)
+            this.updateMore();
     }
 
     render()
@@ -46,6 +81,13 @@ class Rect
             case "img":
             {
                 display.drawImg(currentCtx, this.t, this.c);
+                break;
+            }
+
+            case "ani":
+            {
+                display.drawImg(currentCtx, this.t, this.frameSet[this.frame]);
+                this.frame = (this.frame+1)%this.frameSet.length;
                 break;
             }
 
@@ -169,6 +211,9 @@ class Dynamic extends Rect
         
         this.t.y -= this.v.y;
         this.t.x += this.v.x;
+
+        if (this.updateMore != undefined)
+            this.updateMore();
     }
 
     collideTop({x,y,w,h,o})
@@ -207,7 +252,8 @@ class Dynamic extends Rect
             return true;
         }
         
-        this.grounded = false;
+        if (this.grounded != undefined)
+            this.grounded = false;
         return false;
     }
     collideLeft({x,y,w,h,o})

@@ -17,6 +17,14 @@ const update = () =>
             element.update();
         }
     }
+
+    for (const element of currentCtx.boss)
+    {
+        if (element.active)
+        {
+            element.update();
+        }
+    }
     
     // Player
     PLAYER.updateMovement();
@@ -33,26 +41,17 @@ const update = () =>
 
     // Background
     let colliding = {l:false,r:false,t:false,b:false};
-    for (const element of currentCtx.background)
+    for (const element of ALL)
     {
         if (element.active)
         {
             if (!colliding.l || !colliding.r || !colliding.t || !colliding.b)
+            {
                 colliding = element.updateCollision(colliding);
-            else
-                break;
-        }
-    }
-
-    // Foreground
-    for (const element of currentCtx.foreground)
-    {
-        if (element.active)
-        {
-            if (!colliding.l || !colliding.r || !colliding.t || !colliding.b)
-                colliding = element.updateCollision(colliding);
-            else
-                break;
+            }
+            
+            for (const bullet of currentCtx.boss[0].bullets)
+                element.updateCollision({l:false,r:false,t:false,b:false}, bullet);
         }
     }
 
@@ -63,6 +62,14 @@ const render = () =>
     // Background
     display.drawBackground(currentCtx);
     for (const element of currentCtx.background)
+    {
+        if (element.visible)
+        {
+            element.render();
+        }
+    }
+
+    for (const element of currentCtx.boss)
     {
         if (element.visible)
         {

@@ -30,9 +30,9 @@ class Sword extends Dynamic
         this.stabStep = {x:0,y:0};
         this.justStoppedStabbing = false;
         this.chargingStab = false;
-        this.maxStabCharge = 32;
+        this.maxStabCharge = 128;
         this.stabCharge = 0;
-
+        
         this.t.w = 16;
         this.t.h = 128;
         this.t.o = {x:-0.5,y:-1};
@@ -41,14 +41,24 @@ class Sword extends Dynamic
 
         const SwordAuraImg = new Image();
         SwordAuraImg.src = "Assets/Characters/Player/swordAura.png";
+
+        this.auraInitHeight = SwordAuraImg.height
         this.swordAura = new Img(
             {
             x:this.t.x,
             y:this.t.y,
             w:SwordAuraImg.width,
-            h:SwordAuraImg.height,
+            h:this.auraInitHeight,
             o:this.st.o
         }, SwordAuraImg);
+
+        const cP = "Assets/Characters/Player/charge/charge000";
+        const frames = [];
+        for (let i = 0; i < 9; i++)
+        {
+            frames.push(cP+i+".png");
+        }
+        this.chargeAni = [new Rect("ani", this.t, frames, _NOCOLLISION), new Rect("ani", this.t, frames, _NOCOLLISION, 2),new Rect("ani", this.t, frames, _NOCOLLISION,5)];
 
         window.addEventListener(("keydown"), (e) =>
         {
@@ -105,6 +115,20 @@ class Sword extends Dynamic
         this.r = -this.player.frozenDirection * 80;
         this.t.x = this.player.center.x + -this.player.frozenDirection * 48;
         this.t.y = this.player.t.y - 16;
+
+        for (const chargeA of this.chargeAni)
+        {
+            chargeA.t = this.t;
+            chargeA.t =
+            {
+                x:this.t.x + this.player.frozenDirection * 32,
+                y:this.t.y,
+                w:128,
+                h:128,
+                o:{x:-0.5,y:-0.5}
+            }
+        }
+        
     }
 
     stab()
@@ -113,6 +137,7 @@ class Sword extends Dynamic
         this.chargingStab = false;
         this.stabCooling = 0;
         this.stabbingTimeLeft = 0;
+        this.swordAura.t.h += this.stabCharge/this.maxStabCharge*this.swordAura.t.h;
         
         if (this.directionY == 0)
         {
@@ -199,6 +224,8 @@ class Sword extends Dynamic
             this.moveBy(this.stabStep);
             if (this.stabbingTimeLeft == this.stabbingTime)
             {
+                this.stabCharge = 0;
+                this.swordAura.t.h = this.auraInitHeight;
                 this.justStoppedStabbing = true;
             }
             return;
@@ -236,6 +263,12 @@ class Sword extends Dynamic
             h:this.st.h,
             o:this.st.o
         }, this.c, 1, this.r);
+
+        if (this.chargingStab)
+        {
+            for (const chargeA of this.chargeAni)
+                chargeA.render();
+        }
 
         if (this.renderMore != undefined)
             this.renderMore();
@@ -472,12 +505,12 @@ class Player extends Physics
     collideTopA({y,h,o})
     {
         this.v.y = 0;
-        this.t.y = (y + h * o.y)+h - this.t.h*this.t.o.y;
+        this.t.y = (y+h*o.y)+h - this.t.h*this.t.o.y;
     }
     collideBottomA({y,h,o})
     {
         this.v.y = 0;
-        this.t.y = (y + h * o.y)+this.t.h*this.t.o.y;
+        this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
         this.grounded = true;
         
         this.canDash = true;
@@ -490,12 +523,12 @@ class Player extends Physics
     collideLeftA({x,w,o})
     {
         this.v.x = 0;
-        this.t.x = (x + w * o.x)+w - this.t.w*this.t.o.x+0.01;
+        this.t.x = (x+w*o.x)+w - this.t.w*this.t.o.x+0.01;
     }
     collideRightA({x,w,o})
     {
         this.v.x = 0;
-        this.t.x = (x + w * o.x) - this.t.w - this.t.w*this.t.o.x-0.01;
+        this.t.x = (x+w*o.x) - this.t.w - this.t.w*this.t.o.x-0.01;
     }
 
     Death()
