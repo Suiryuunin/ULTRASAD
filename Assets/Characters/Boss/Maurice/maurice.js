@@ -15,6 +15,7 @@ class Bullet extends Dynamic
         this.bullet = true;
         this.player = PLAYER;
         this.dying = false;
+        this.dyingC = dedBulletIMG;
 
         //Player Control
         this.hijacked = false;
@@ -105,7 +106,7 @@ class Bullet extends Dynamic
         
         if (this.dying && this.deathCountDown > 0)
         {
-            if (this.deathCountDown == this.initDC) {this.c = dedBulletIMG; this.r = Math.random()*360}
+            if (this.deathCountDown == this.initDC) {this.c = this.dyingC; this.r = Math.random()*360}
             this.t.w*=1.1;
             this.t.h*=1.1;
             this.alpha*=0.75
