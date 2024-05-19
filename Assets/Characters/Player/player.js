@@ -292,6 +292,7 @@ class Sword extends Dynamic
             h:this.swordAura.t.h,
             o:this.st.o
         };
+        console.log(this.swordAura)
 
         if (this.stabbingTimeLeft < this.stabbingTime)
             display.drawImg(currentCtx,this.swordAura.t, this.swordAura.c, 0.8, this.r);
