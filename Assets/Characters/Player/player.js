@@ -1,9 +1,6 @@
 const BulletPIMG = new Image();
 BulletPIMG.src = "Assets/Characters/Player/bulletP.png";
 
-const dedBulletPIMG = new Image();
-dedBulletPIMG.src = "Assets/Characters/Player/dedbulletP.png";
-
 class Sword extends Dynamic
 {
     constructor(player, c)
