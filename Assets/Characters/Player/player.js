@@ -47,12 +47,12 @@ class Sword extends Dynamic
         const SwordAuraImg = new Image();
         SwordAuraImg.src = "Assets/Characters/Player/swordAura.png";
 
-        this.auraInitHeight = SwordAuraImg.height
+        this.auraInitHeight = 160;
         this.swordAura = new Img(
             {
             x:this.t.x,
             y:this.t.y,
-            w:SwordAuraImg.width,
+            w:64,
             h:this.auraInitHeight,
             o:this.st.o
         }, SwordAuraImg);
@@ -292,7 +292,6 @@ class Sword extends Dynamic
             h:this.swordAura.t.h,
             o:this.st.o
         };
-        console.log(this.swordAura)
 
         if (this.stabbingTimeLeft < this.stabbingTime)
             display.drawImg(currentCtx,this.swordAura.t, this.swordAura.c, 0.8, this.r);
