@@ -39,6 +39,11 @@ const update = () =>
         }
     }
 
+    for (const element of explosions)
+    {
+        element.update();
+    }
+
     // Background
     let colliding = {l:false,r:false,t:false,b:false};
     for (const element of ALL)
@@ -51,14 +56,22 @@ const update = () =>
             }
             
             if (!element.boss)
-            for (const bullet of currentCtx.boss[0].bullets)
-                element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
+                for (const bullet of currentCtx.boss[0].bullets)
+                    element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
+
+            for (const bullet of PLAYER.bullets)
+                if (!bullet.trapped)
+                    element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
         }
     }
 
     for (const bullet of currentCtx.boss[0].bullets)
     {
-        if (PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet) && !PLAYER.shield)
+        for (const pbullet of PLAYER.bullets)
+        {
+            if (pbullet.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet)) break;
+        }
+        if (!PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet) && !PLAYER.shield)
             PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
     }
 
@@ -97,6 +110,11 @@ const render = () =>
     }
 
     for (const element of FOREGROUNDQUEUE)
+    {
+        element.render();
+    }
+
+    for (const element of explosions)
     {
         element.render();
     }

@@ -13,6 +13,9 @@ class Display
         
         this.color = "black";
         this.font = "Times New Roman";
+        this.shakeStr = 8;
+        this.stacks = 0;
+        this.camShake = 0;
     }
 
     drawBackground(ctx, color = "black")
@@ -135,7 +138,8 @@ class Display
         this.display.drawImage(currentCtx.canvas,
             0, 0,
             currentCtx.canvas.width, currentCtx.canvas.height,
-            0, 0,
+            0+Math.round((Math.random()-0.5)*this.shakeStr*this.stacks*2*this.camShake),
+            0+Math.round((Math.random()-0.5)*this.shakeStr*this.stacks*2*this.camShake),
             this.display.canvas.width, this.display.canvas.height);
 
         this.color = this.brightness <= 25 ? "white" : "black";

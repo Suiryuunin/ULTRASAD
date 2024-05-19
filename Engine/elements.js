@@ -60,12 +60,12 @@ class Rect
     checkCRCollision(e)
     {
         if (this.collision != _NOCOLLISION || this.player)
-            return e.circleRect(this.t);
+            return e.circleRect(this.t, this);
     }
     checkCCCollision(e)
     {
         if (this.player)
-            return e.circleCircle({x:this.center.x,y:this.center.y}, this.radius);
+            return e.circleCircle({x:this.center.x,y:this.center.y}, this.radius, this);
     }
 
     updateCollision({l,r,t,b}, type = "rect/rect", exception = undefined)
@@ -250,7 +250,7 @@ class Dynamic extends Rect
             this.updateMore();
     }
 
-    circleRect({x,y,w,h,o})
+    circleRect({x,y,w,h,o}, e)
     {
         const rx = x + w * o.x, ry = y + h * o.y;
 
@@ -274,14 +274,14 @@ class Dynamic extends Rect
         if (distance <= this.t.w/2)
         {
             if (this.circleRectA != undefined)
-                this.circleRectA({x:distX, y:distY}, distance);
+                this.circleRectA({x:distX, y:distY}, distance, e);
 
             return true;
         }
         return false;
     }
 
-    circleCircle({x,y}, r)
+    circleCircle({x,y}, r, e)
     {
 
         const cx = this.center.x, cy = this.center.y;
@@ -293,7 +293,7 @@ class Dynamic extends Rect
         if (distance <= (r+this.t.w/2))
         {
             if (this.circleCircleA != undefined)
-                this.circleCircleA({x:distX,y:distY}, distance, r);
+                return this.circleCircleA({x:distX,y:distY}, distance, r, e);
 
             return true;
         }
@@ -398,5 +398,8 @@ class Physics extends Dynamic
             this.v.y += _GRAVITY*this.gravityMultiplier;
         this.t.y -= this.v.y;
         this.t.x += this.v.x;
+
+        if (this.updateMore != undefined)
+            this.updateMore();
     }
 }

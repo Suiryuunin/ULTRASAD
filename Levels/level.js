@@ -12,7 +12,7 @@ currentCtx.background =
 ];
 currentCtx.boss =
 [
-    new Maurice({x:_VCENTER.x, y:640, w:128, h:128, o:{x:-0.5,y:-0.5}}, playerIMG, _BLOCKALL, PLAYER)
+    new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, playerIMG, _BLOCKALL, PLAYER)
 ]
 currentCtx.foreground =
 [

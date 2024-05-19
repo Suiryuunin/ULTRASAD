@@ -1,3 +1,9 @@
+const BulletPIMG = new Image();
+BulletPIMG.src = "Assets/Characters/Player/bulletP.png";
+
+const dedBulletPIMG = new Image();
+dedBulletPIMG.src = "Assets/Characters/Player/dedbulletP.png";
+
 class Sword extends Dynamic
 {
     constructor(player, c)
@@ -32,6 +38,8 @@ class Sword extends Dynamic
         this.chargingStab = false;
         this.maxStabCharge = 128;
         this.stabCharge = 0;
+
+        this.chargeQueued = false;
         
         this.t.w = 16;
         this.t.h = 128;
@@ -76,7 +84,7 @@ class Sword extends Dynamic
                     this.player.shield = true;
                     return;
                 }
-                this.keys[e.code] = false;
+                this.chargeQueued = true;
                 return;
             }
 
@@ -98,6 +106,9 @@ class Sword extends Dynamic
             {
                 if (this.stabCooldown == this.stabCooling)
                     this.stab();
+
+                if (this.chargeQueued)
+                    this.chargeQueued = false;
                 return;
             }
 
@@ -146,7 +157,23 @@ class Sword extends Dynamic
         this.stabCooling = 0;
         this.stabbingTimeLeft = 0;
         this.swordAura.t.h += this.stabCharge/this.maxStabCharge*this.swordAura.t.h;
+
         this.player.shield = false;
+        for (const bullet of this.player.bullets)
+        {
+            if (bullet.trapped)
+            {
+                bullet.trapped = false;
+                bullet.speed = 64;
+                bullet.slowing = true;
+                bullet.direction = 
+                {
+                    x:  Math.cos(bullet.angle),
+                    y: -Math.sin(bullet.angle)
+                };
+                bullet.immune = 0;
+            }
+        }
         
         if (this.directionY == 0)
         {
@@ -215,6 +242,14 @@ class Sword extends Dynamic
             return;
         }
 
+        if (this.stabCooldown == this.stabCooling && this.chargeQueued)
+        {
+            this.t.o = this.st.o = {x:-0.5, y:0};
+            this.chargingStab = true;
+            this.player.shield = true;
+            this.chargeQueued = false;
+        }
+            
         if (this.stabCooling < this.stabCooldown && this.stabbingTimeLeft == this.stabbingTime)
             this.stabCooling++;
 
@@ -309,7 +344,14 @@ class Player extends Physics
         {
             frames.push(sP+i+".png");
         }
-        this.shieldAni = new Rect("ani", this.t, [frames], _NOCOLLISION);
+        this.shieldAni = new Rect("ani",
+        {
+            x: this.center.x,
+            y: this.center.y,
+            w: this.radius*2,
+            h: this.radius*2,
+            o: {x:-0.5,y:-0.5}
+        }, frames, _NOCOLLISION);
         
         // Movements
         this.direction = 0;
@@ -572,8 +614,29 @@ class Player extends Physics
         }
     }
 
+    updateMore()
+    {
+        this.shieldAni.t =
+        {
+            x: this.center.x,
+            y: this.center.y,
+            w: this.radius*2,
+            h: this.radius*2,
+            o: {x:-0.5,y:-0.5}
+        };
+    }
+
     renderMore()
     {
+        for (let i = 0; i < this.bullets.length; i++)
+        {
+            if (!this.bullets[i].active)
+            {
+                FOREGROUNDQUEUE.splice(FOREGROUNDQUEUE.indexOf(this.bullets[i]), 1);
+                this.bullets.splice(i,1);
+            }
+        }
+
         this.sword.render();
         if (this.shield)
             this.shieldAni.render();

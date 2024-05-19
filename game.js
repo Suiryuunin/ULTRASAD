@@ -8,6 +8,10 @@ const _VCENTER = {x: Math.floor(res.w/2), y: Math.floor(res.h/2)};
 const _NOOFFSET = {x:0,y:0};
 const _CENTEROFFSET = {x:-0.5,y:-0.5};
 
+const EXPLOSIONIMG = new Image();
+EXPLOSIONIMG.src = "Assets/Textures/explosion.png";
+let explosions = [];
+
 function toCanvasCoords(pageX, pageY)
 {
     const _rect = document.querySelector("canvas").getBoundingClientRect();
@@ -18,7 +22,7 @@ function toCanvasCoords(pageX, pageY)
 
     return {x, y};
 }
-const FOREGROUNDQUEUE = [];
+let FOREGROUNDQUEUE = [];
 const playerIMG = new Image(64, 128);
 playerIMG.src = "Assets/Textures/bg720p.jpg";
 const PLAYER = new Player("img", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},playerIMG);
