@@ -61,6 +61,8 @@ class Display
 
     drawImg(ctx, {x, y, w, h, o}, img, alpha = 1, r = 0, sx=1,sy=1)
     {
+        if (alpha == 0) return;
+
         ctx.globalAlpha = alpha;
         if (o != undefined && r == 0 && sx == 1 && sy == 1)
         {
@@ -92,8 +94,10 @@ class Display
         ctx.restore();
     }
 
-    drawRect(ctx, {x, y, w, h, o}, color = this.color, alpha = 1, content = "fill", thickness = 1)
+    drawRect(ctx, {x, y, w, h, o}, color = this.color, alpha = 1, content = "fill", thickness = 1, color2)
     {
+        if (alpha == 0) return;
+
         ctx.globalAlpha = alpha;
         if (o != undefined)
         {
@@ -104,7 +108,7 @@ class Display
         if (content.includes("border"))
         {
             ctx.lineWidth = thickness;
-            ctx.strokeStyle = color;
+            ctx.strokeStyle = color2 == undefined ? color : color2;
             ctx.beginPath();
             ctx.rect(x, y, w, h);
             ctx.stroke();
@@ -134,14 +138,11 @@ class Display
 
     render()
     {
-
         this.display.drawImage(currentCtx.canvas,
             0, 0,
             currentCtx.canvas.width, currentCtx.canvas.height,
-            0+Math.round((Math.random()-0.5)*this.shakeStr*this.stacks*2*this.camShake),
-            0+Math.round((Math.random()-0.5)*this.shakeStr*this.stacks*2*this.camShake),
+            (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake),
+            (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake),
             this.display.canvas.width, this.display.canvas.height);
-
-        this.color = this.brightness <= 25 ? "white" : "black";
     }
 }

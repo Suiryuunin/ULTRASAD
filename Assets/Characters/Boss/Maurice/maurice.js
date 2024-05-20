@@ -6,15 +6,17 @@ dedBulletIMG.src = "Assets/Characters/Boss/Maurice/Textures/dedBullet.png";
 
 class Bullet extends Dynamic
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, target, boss)
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, target, boss, SP = false)
     {
         super("img", {x,y,w,h,o}, c, collision);
 
         this.target = target;
         this.boss = boss;
+        this.canStab = true;
         this.bullet = true;
         this.player = PLAYER;
         this.dying = false;
+        this.SP = SP;
 
         //Player Control
         this.hijacked = false;
@@ -26,27 +28,50 @@ class Bullet extends Dynamic
 
         this.deathCountDown = this.initDC= 12;
         this.t.w = this.t.h = 48;
-        this.speed = 16;
+        this.speed = SP ? 128 : 16;
         this.slowing = false;
         this.r = 0;
         this.jitteriness = (Math.random()+1)*4;
         this.setDirectionTo({x:target.x, y:target.y});
         this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+
+        this.shaking = false;
     }
 
     circleRectA({x,y}, d, e)
     {
         if (this.dying) return;
 
-        if (d == 0) d = 1*(10**-64);
-        const m = d/(d-Math.sign(d)*(this.t.w/4));
-        x/=m;
-        y/=m;
         
-        this.t.x = (this.center.x-x)+this.t.w*this.t.o.x+this.t.w/2;
-        this.t.y = (this.center.y-y)+this.t.h*this.t.o.y+this.t.h/2;
+            if (d == 0) d = 1*(10**-64);
+            const m = d/(d-Math.sign(d)*(this.t.w/4));
+            x/=m;
+            y/=m;
+            
+            this.t.x = (this.center.x-x)+this.t.w*this.t.o.x+this.t.w/2;
+            this.t.y = (this.center.y-y)+this.t.h*this.t.o.y+this.t.h/2;
 
-        if (e.boss) explosions.push(new Explosion(this.t, EXPLOSIONIMG));
+            this.shaking = true;
+            if (!this.SP)
+            {
+                if (e.boss) explosions.push(new Explosion(this.t, EXPLOSIONIMG));
+                else if (display.stacks < 4) display.stacks++;
+                
+                if (e.player) e.dmg(1);
+            }
+            else
+            {
+                display.stacks += 16;
+                explosions.push(new Explosion(this.t, EXPLOSIONIMG, 0.6, 12, {w:192,h:192}, _NOCOLLISION, true));
+
+                for (const bullet of this.player.bullets)
+                {
+                    bullet.dying = true;
+                }
+            }
+            
+            shakeReset = 32;
+        
         this.hit = true;
         this.dying = true;
     }
@@ -56,34 +81,38 @@ class Bullet extends Dynamic
         if (this.dying || e.immune > 0)
             return;
 
-        if (e.hijacked)
+        if (!this.SP)
         {
-            this.t.x = e.center.x-this.t.w*this.direction.x;
-            this.t.y = e.center.y-this.t.h*this.direction.y;
-            this.hit = true;
-            this.dying = true;
+            if (e.hijacked)
+            {
+                this.t.x = e.center.x-this.t.w*this.direction.x;
+                this.t.y = e.center.y-this.t.h*this.direction.y;
+                this.hit = true;
+                this.dying = true;
 
-            explosions.push(new Explosion(this.t, EXPLOSIONIMG));
-            e.hit = true;
-            e.dying = true;
-            return;
+                explosions.push(new Explosion(this.t, EXPLOSIONIMG));
+                e.hit = true;
+                e.dying = true;
+                return;
+            }
+            if (!this.hijacked && this.player.shield)
+            {
+                this.immune = 12;
+                x/=d; y/=d;
+                this.angle = Math.atan(y/x);
+                if (x < 0) this.angle+=Math.PI;
+
+                this.hijacked = true;
+                this.trapped = true;
+                this.radius = radius;
+                this.c = BulletPIMG;
+
+
+                this.boss.bullets.splice(this.boss.bullets.indexOf(this),1);
+                this.player.bullets.push(this);
+            }
         }
-        if (!this.hijacked && this.player.shield)
-        {
-            this.immune = 12;
-            x/=d; y/=d;
-            this.angle = Math.atan(y/x);
-            if (x < 0) this.angle+=Math.PI;
-
-            this.hijacked = true;
-            this.trapped = true;
-            this.radius = radius;
-            this.c = BulletPIMG;
-
-
-            this.boss.bullets.splice(this.boss.bullets.indexOf(this),1);
-            this.player.bullets.push(this);
-        }
+        
     }
 
     updateMore()
@@ -100,6 +129,8 @@ class Bullet extends Dynamic
         if (this.deathCountDown == 0)
         {
             this.active = false;
+            display.camShake = 0;
+            this.shaking = false;
             return;
         }
         
@@ -110,6 +141,9 @@ class Bullet extends Dynamic
             this.t.h*=1.1;
             this.alpha*=0.75
             this.deathCountDown--;
+            
+            display.camShake = 0.05;
+
             if (this.hit) return;
         }
         
@@ -159,6 +193,7 @@ class Maurice extends Dynamic
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
+        this.hp = 75;
         this.player = player;
 
         this.bulletCooldownTime = this.bulletCooldown = 4;
@@ -166,8 +201,17 @@ class Maurice extends Dynamic
         this.bulletDurationTime = 0;
         this.cooldown = 32;
         this.cooling = 0;
-        this.chargeTime = this.charging = 16;
+        this.chargeTime = this.charge = 16;
+        this.charging = false;
         this.bullets = [];
+        this.target = {x:0,y:0};
+
+        this.attackPhase = 0;
+    }
+
+    dmg(dmg)
+    {
+        this.hp -= dmg;
     }
 
     update()
@@ -179,6 +223,23 @@ class Maurice extends Dynamic
         
         if (this.cooling == this.cooldown)
         {
+            if (this.charging)
+            {
+                if (this.charge < this.chargeTime)
+                {
+                    if (this.charge == Math.floor(this.chargeTime/2.5))
+                        this.target = {x:this.player.center.x, y:this.player.center.y};
+                    this.charge++;
+                }
+                else
+                {
+                    this.bullets.push(new Bullet(this.t, BulletPIMG, _NOCOLLISION, this.target, this, true));
+                    FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
+                    this.cooling = 0;
+                }
+                return;
+            }
+
             if (this.bulletDurationTime == this.bulletDuration)
             {
                 this.bulletDurationTime = 0;
@@ -203,6 +264,16 @@ class Maurice extends Dynamic
         else
         {
             this.cooling++;
+            this.attackPhase = ((this.attackPhase) % 3) + 1;
+            if (this.attackPhase == 3)
+            {
+                this.charging = true;
+                this.charge = 0;
+            }
+            else
+            {
+                this.charging = false;
+            }
         }
     }
 

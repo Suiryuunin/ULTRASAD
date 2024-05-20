@@ -1,17 +1,21 @@
-class Explosion extends Img
+class Explosion extends Dynamic
 {
-    constructor({x,y,w,h,o}, c, speed = 0.7, time = 6, size = {w:128,h:128}, collision = _NOCOLLISION)
+    constructor({x,y,w,h,o}, c, speed = 0.7, time = 6, size = {w:128,h:128}, collision = _NOCOLLISION, SP = false)
     {
-        super({x,y,w,h,o},c, collision);
+        super("img", {x,y,w,h,o},c, collision);
         this.t.w = size.w;
         this.t.h = size.h;
         this.speed = speed;
-        this.increment = 128;
+        this.increment = size.w;
         this.time = this.initTime = time;
         this.r = Math.random()*360;
+        this.center = {x:this.t.x,y:this.t.y};
+        this.SP = SP;
 
-        display.camShake = 1;
-        display.stacks++;
+        display.camShake = 8;
+        shakeReset = shakeDuration;
+        display.stacks += 2;
+        this.shaking = true;
     }
 
     updateMore()
@@ -25,7 +29,7 @@ class Explosion extends Img
             if (this.time == Math.round(this.initTime/2))
             {
                 display.camShake = 0;
-                display.stacks--;
+                this.shaking = false;
             }
             return;
         }
@@ -34,5 +38,13 @@ class Explosion extends Img
         this.alpha*=0.9;
         this.time--;
         if (this.time <= -this.initTime*2) explosions.splice(explosions.indexOf(this), 1);
+    }
+
+    circleRectA({x:distX, y:distY}, distance, e)
+    {
+        if (e.hp != undefined)
+        {
+            e.dmg(this.SP ? 0.15 : 0.1);
+        }
     }
 }

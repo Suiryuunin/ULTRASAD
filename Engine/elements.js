@@ -1,9 +1,13 @@
+let id = 0;
+
 class Rect
 {
     constructor(type = "none", {x,y,w,h,o}, c, collision = _BLOCKALL, initFrame = 0)
     {
         this.type = type;
         this.name = "nameless";
+        this.id = id;
+        id++;
         this.t = {x:x,y:y,w:w,h:h,o:o};
         this.ot = {x:x,y:y,w:w,h:h,o:o};
         this.c = c;
@@ -16,6 +20,8 @@ class Rect
         this.flip = {x:1,y:1};
         this.r = 0;
         this.alpha = 1;
+
+        this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
 
         if (this.type == "ani")
         {
@@ -314,6 +320,8 @@ class Dynamic extends Rect
         {
             if (this.collideTopA != undefined)
                 this.collideTopA({x,y,w,h,o});
+            if (this.collideAllA != undefined)
+                this.collideAllA({x,y,w,h,o});
             return true;
         }
         
@@ -333,6 +341,8 @@ class Dynamic extends Rect
         {
             if (this.collideBottomA != undefined)
                 this.collideBottomA({x,y,w,h,o});
+            if (this.collideAllA != undefined)
+                this.collideAllA({x,y,w,h,o});
             return true;
         }
         
@@ -354,6 +364,8 @@ class Dynamic extends Rect
         {
             if (this.collideLeftA != undefined)
                 this.collideLeftA({x,y,w,h,o});
+            if (this.collideAllA != undefined)
+                this.collideAllA({x,y,w,h,o});
             return true;
         }
         
@@ -373,6 +385,8 @@ class Dynamic extends Rect
         {
             if (this.collideRightA != undefined)
                 this.collideRightA({x,y,w,h,o});
+            if (this.collideAllA != undefined)
+                this.collideAllA({x,y,w,h,o});
             return true;
         }
         
