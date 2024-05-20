@@ -59,7 +59,7 @@ const BLOODIMGs = [BLOODIMG0, BLOODIMG1, BLOODIMG2];
 
 class Blood extends Physics
 {
-    constructor({x,y,w,h,o}, size, {vx, vy}, lifespan = 256)
+    constructor({x,y,w,h,o}, size, {vx, vy})
     {
         super("img", {x,y,w,h,o}, BLOODIMGs[Math.round(Math.random()*2)], _NOCOLLISION);
         this.gravityMultiplier = 0.5;
@@ -67,31 +67,8 @@ class Blood extends Physics
         this.t.w+=this.t.w*size;
         this.t.h+=this.t.h*size;
         this.t.w = this.t.h = this.t.w + (Math.random()-0.5)*this.t.w;
-        this.lifespan = lifespan;
-        this.dying = false;
         this.r = Math.random()*360;
         this.alpha = 0.2;
-    }
-
-    updateMore()
-    {
-        if (this.dying)
-        {
-            if (this.alpha < 0.1)
-            {
-                this.active = false;
-                return;
-            }
-            this.alpha *= 0.8;
-            return;
-        }
-
-        if (this.lifespan > 0)
-        {
-            this.lifespan--;
-            return;
-        }
-        this.dying = true;
     }
 
     collideAllA()
@@ -100,6 +77,8 @@ class Blood extends Physics
         this.v = {x:0,y:0};
         this.t.h *= 0.5;
         this.t.w *= 0.5;
+        this.active = false;
+        display.drawImg(BLOODCTX, this.t, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
     }
 
     collideTopA({y,h,o})
@@ -117,6 +96,10 @@ class Blood extends Physics
     collideRightA({x,w,o})
     {
         this.t.x = x+w*o.x;
+    }
+    render()
+    {
+        display.drawImg(currentCtx, this.t, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
     }
 }
 

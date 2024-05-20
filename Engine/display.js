@@ -138,11 +138,22 @@ class Display
 
     render()
     {
+        const shakePos =
+        {
+            x: (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake),
+            y: (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake)
+        }
         this.display.drawImage(currentCtx.canvas,
             0, 0,
             currentCtx.canvas.width, currentCtx.canvas.height,
-            (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake),
-            (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake),
+            shakePos.x,
+            shakePos.y,
+            this.display.canvas.width, this.display.canvas.height);
+        
+        this.display.drawImage(BLOODCTX.canvas,
+            0, 0,
+            BLOODCTX.canvas.width, BLOODCTX.canvas.height,
+            0, 0,
             this.display.canvas.width, this.display.canvas.height);
     }
 }

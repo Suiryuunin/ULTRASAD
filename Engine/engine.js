@@ -18,7 +18,7 @@ function drawSword()
         h:PLAYER.sword.st.h,
         o:PLAYER.sword.st.o
     }, PLAYER.sword.c, 1, PLAYER.sword.r);
-    display.render();
+    display.render(); 
 }
 
 class Engine

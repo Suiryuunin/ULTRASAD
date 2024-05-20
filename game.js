@@ -26,6 +26,9 @@ function toCanvasCoords(pageX, pageY)
 }
 let FOREGROUNDQUEUE = [];
 let BLOOD = [];
+const BLOODCTX = document.createElement("canvas").getContext("2d");
+BLOODCTX.canvas.width = res.w;
+BLOODCTX.canvas.height = res.h;
 let BLOODGENERATORS = [];
 
 const playerIMG = new Image(64, 128);

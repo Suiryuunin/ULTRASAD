@@ -569,7 +569,8 @@ class Player extends Physics
     dmg(dmg, {x,y}, explosion = false)
     {
         this.hp -= dmg;
-        this.hardDmg += dmg/2;
+        if (dmg < this.hp)
+            this.hardDmg += dmg/2;
         this.lastHit = 128;
 
         if (explosion)
@@ -753,6 +754,10 @@ class Player extends Physics
 
     lateUpdate()
     {
+        if (this.lastHit > 0)
+            this.lastHit--;
+        else if (this.hardDmg > 0)
+            this.hardDmg-=0.05;
         for (const bullet of this.bullets)
         {
             bullet.update();
@@ -765,12 +770,8 @@ class Player extends Physics
             if (this.alpha < 0.1) this.alpha = 0;
             return;
         }
-
-        if (this.lastHit > 0)
-            this.lastHit--;
-        else if (this.hardDmg > 0)
-            this.hardDmg-=0.05;
         this.sword.update();
+
         this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
     }
 
