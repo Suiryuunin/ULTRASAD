@@ -193,7 +193,7 @@ class Maurice extends Dynamic
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
-        this.hp = 75;
+        this.hp = this.maxHp = 75;
         this.player = player;
 
         this.bulletCooldownTime = this.bulletCooldown = 4;
@@ -205,6 +205,7 @@ class Maurice extends Dynamic
         this.charging = false;
         this.bullets = [];
         this.target = {x:0,y:0};
+        this.enraged = false;
 
         this.attackPhase = 0;
     }
@@ -216,12 +217,21 @@ class Maurice extends Dynamic
 
     update()
     {
+        if (this.hp <= this.maxHp/2 && !this.enraged)
+        {
+            this.bulletCooldownTime/=2;
+            this.cooling = 0;
+            this.cooldown/=2;
+            this.chargeTime/=2;
+            this.charge=0;
+            this.enraged = true;
+        }
         for (const bullet of this.bullets)
         {
             bullet.update();
         }
         
-        if (this.cooling == this.cooldown)
+        if (this.cooling >= this.cooldown)
         {
             if (this.charging)
             {
@@ -240,7 +250,7 @@ class Maurice extends Dynamic
                 return;
             }
 
-            if (this.bulletDurationTime == this.bulletDuration)
+            if (this.bulletDurationTime >= this.bulletDuration)
             {
                 this.bulletDurationTime = 0;
                 this.cooling = 0;
@@ -250,7 +260,7 @@ class Maurice extends Dynamic
                 this.bulletDurationTime++;
             }
             
-            if (this.bulletCooldown == this.bulletCooldownTime)
+            if (this.bulletCooldown >= this.bulletCooldownTime)
             {
                 this.bulletCooldown = 0;
                 this.bullets.push(new Bullet(this.t, BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
