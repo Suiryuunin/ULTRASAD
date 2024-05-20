@@ -10,6 +10,8 @@ const _CENTEROFFSET = {x:-0.5,y:-0.5};
 
 const EXPLOSIONIMG = new Image();
 EXPLOSIONIMG.src = "Assets/Textures/explosion.png";
+const BIGEXPLOSIONIMG = new Image();
+BIGEXPLOSIONIMG.src = "Assets/Textures/bigExplosion.png";
 let explosions = [];
 
 function toCanvasCoords(pageX, pageY)
@@ -27,3 +29,7 @@ const playerIMG = new Image(64, 128);
 playerIMG.src = "Assets/Textures/bg720p.jpg";
 let PLAYER = new Player("img", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},playerIMG);
 PLAYER.name = "player";
+
+window.addEventListener("click", (e) => e.preventDefault());
+window.addEventListener("mousedown", (e) => e.preventDefault());
+window.addEventListener("mouseup", (e) => e.preventDefault());

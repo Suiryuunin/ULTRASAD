@@ -62,7 +62,7 @@ class Bullet extends Dynamic
             else
             {
                 display.stacks += 16;
-                explosions.push(new Explosion(this.t, EXPLOSIONIMG, 0.6, 12, {w:192,h:192}, _NOCOLLISION, true));
+                explosions.push(new Explosion(this.t, BIGEXPLOSIONIMG, 0.6, 12, {w:192,h:192}, _NOCOLLISION, true));
 
                 for (const bullet of this.player.bullets)
                 {

@@ -475,7 +475,7 @@ class Player extends Physics
         this.direction = 0;
         this.frozenDirection = 1;
 
-        this.walkingSpeed = 4; this.runningSpeed = 6; this.sprintSpeed = 8; this.airControl = 0.2;
+        this.walkingSpeed = 8; this.airControl = 0.2;
 
         this.maxV.x = this.walkingSpeed; this.acceleration = 2; this.speed = this.acceleration;
 
@@ -492,8 +492,6 @@ class Player extends Physics
             "KeyD": false,
             "KeyK": false
         }
-
-        this.sprintCounter = 0;
 
         this.dashDuration = 2; this.dashTimer = this.dashDuration; this.dashing = false; this.canDash = false; this.dashCooldown = 0;
 
@@ -512,9 +510,9 @@ class Player extends Physics
 
         window.addEventListener("keydown", (e) =>
         {
-            if (e.code == "ShiftLeft" && !this.dashing)
+            if (e.code == "ShiftLeft" && !this.shifting)
             {
-                this.run();
+                this.startDash();
                 this.shifting = true;
             } //
             const code = this.convertKeys(e.code);
@@ -541,10 +539,8 @@ class Player extends Physics
         });
         window.addEventListener("keyup", (e) =>
         {
-            if (e.code == "ShiftLeft" && !this.dashing)
+            if (e.code == "ShiftLeft")
             {
-                this.runStop();
-                this.startDash();
                 this.shifting = false;
             } //
             const code = this.convertKeys(e.code);
@@ -563,20 +559,9 @@ class Player extends Physics
         this.lastHit = 128;
     }
 
-    run()
-    {
-        if (this.direction != 0 && this.maxV.x != this.runningSpeed)
-            this.maxV.x = this.runningSpeed;
-    }
-    runStop()
-    {
-        if (this.maxV.x != this.walkingSpeed)
-            this.maxV.x = this.walkingSpeed;
-    }
-
     startDash()
     {
-        if (this.sprintCounter <= 12 && this.sprintCounter != 0 && this.canDash && this.dashCooldown == 0)
+        if (this.dashCooldown == 0)
         {
             this.maxV.x = 96;
             this.speed = 64;
@@ -589,7 +574,7 @@ class Player extends Physics
             this.canDash = false;
             this.dashCooldown = 16;
         }
-        this.sprintCounter = 0;
+        
     }
     dash()
     {
@@ -627,15 +612,6 @@ class Player extends Physics
 
         if (this.v.y < 0)
             this.airControl = 0.2;
-
-        // Sprinting
-        if (this.shifting)
-            this.sprintCounter++;
-
-        if (this.sprintCounter > 32)
-        {
-            this.maxV.x = this.sprintSpeed;
-        }
 
         // Dash
         if (this.dashCooldown > 0)

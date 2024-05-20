@@ -156,7 +156,7 @@ const render = () =>
     display.render();
 };
 
-const engine = new Engine(30, update, render);
+const engine = new Engine(60, update, render);
 const display = new Display(canvas);
 
 engine.start();
