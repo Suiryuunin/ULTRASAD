@@ -78,6 +78,13 @@ class Bullet extends Dynamic
         this.dying = true;
     }
 
+    explode()
+    {
+        explosions.push(new Explosion(this.t, EXPLOSIONIMG));
+        this.hit = true;
+        this.dying = true;
+    }
+
     circleCircleA({x,y}, d, radius, e)
     {
         if (this.dying || e.immune > 0)
@@ -195,7 +202,7 @@ class Maurice extends Dynamic
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
-        this.hp = this.maxHp = 75;
+        this.hp = this.maxHp = 15;
         this.player = player;
 
         this.bulletCooldownTime = this.bulletCooldown = 4;
@@ -208,6 +215,9 @@ class Maurice extends Dynamic
         this.bullets = [];
         this.target = {x:0,y:0};
         this.enraged = false;
+        this.dying = false;
+        this.grounded = false;
+        this.gravityMultiplier = 0.01;
 
         this.attackPhase = 0;
     }
@@ -216,13 +226,40 @@ class Maurice extends Dynamic
     {
         this.hp -= dmg;
         if (explosion)
-            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, 4, 0.7, 10,12, true));
+            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12, true));
         else
-            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, 64, 0.7, 10,12));
+            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12));
+    }
+
+    collideBottomA({y,h,o})
+    {
+        this.v.y = 0;
+        this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
+        this.grounded = true;
     }
 
     update()
     {
+        this.setOldTransform();
+        for (const bullet of this.bullets)
+        {
+            bullet.update();
+        }
+        if (this.dying)
+        {
+            this.gravityMultiplier *= 1.5;
+            if (!this.grounded)
+                this.v.y += _GRAVITY*this.gravityMultiplier;
+            this.t.y -= this.v.y;
+            this.t.x += this.v.x;
+            this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+            return;
+        }
+        if (this.hp <= 0)
+        {
+            this.dmg(128,{x:0,y:0});
+            this.dying = true;
+        }
         if (this.hp <= this.maxHp/2 && !this.enraged)
         {
             this.bulletCooldownTime/=2;
@@ -232,11 +269,9 @@ class Maurice extends Dynamic
             this.charge=0;
             this.enraged = true;
         }
-        for (const bullet of this.bullets)
-        {
-            bullet.update();
-        }
-        
+        if (PLAYER.dying)
+            return;
+
         if (this.cooling >= this.cooldown)
         {
             if (this.charging)

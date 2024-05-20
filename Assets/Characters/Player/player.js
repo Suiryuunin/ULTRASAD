@@ -452,6 +452,9 @@ class Player extends Physics
         const swordIMG = new Image();
         swordIMG.src = "Assets/Characters/Player/sword.png";
         this.sword = new Sword(this, swordIMG);
+        this.dying = false;
+
+        this.sinRo = 0;
 
         this.bullets = [];
 
@@ -515,6 +518,9 @@ class Player extends Physics
 
         window.addEventListener("keydown", (e) =>
         {
+            if (this.dying)
+                return;
+
             if (e.code == "ShiftLeft" && !this.shifting)
             {
                 this.startDash();
@@ -544,6 +550,9 @@ class Player extends Physics
         });
         window.addEventListener("keyup", (e) =>
         {
+            if (this.dying)
+                return;
+            
             if (e.code == "ShiftLeft")
             {
                 this.shifting = false;
@@ -555,7 +564,6 @@ class Player extends Physics
                 this.keys[code] = false;
             }
         });
-        console.log(this)
     }
 
     dmg(dmg, {x,y}, explosion = false)
@@ -565,9 +573,9 @@ class Player extends Physics
         this.lastHit = 128;
 
         if (explosion)
-            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, 16, 0.7, 6,8, true));
+            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*4, 0.7, 6,8, true));
         else
-            BLOODGENERATORS.push(new BloodGenerator({x:x+(Math.random()-0.5)*16,y:y+32}, 32, 0.7, 6, 8));
+            BLOODGENERATORS.push(new BloodGenerator({x:x+(Math.random()-0.5)*16,y:y+64}, dmg*12, 0.7, 6, 8));
     }
 
     startDash()
@@ -654,8 +662,10 @@ class Player extends Physics
 
     updateMovement()
     {
-        if (this.hp <= 0)
-            reset();
+        if (this.hp <= 0 && !this.dying)
+        {
+            this.Death();
+        }
 
         this.updateCounters();
 
@@ -670,7 +680,7 @@ class Player extends Physics
             this.stopDash();
             return;
         }
-        if (this.gravityMultiplier < 1)
+        if (this.gravityMultiplier < 1 && !this.dying)
         {
             this.gravityMultiplier += 0.1;
         }
@@ -690,11 +700,17 @@ class Player extends Physics
     
     collideTopA({y,h,o})
     {
+        if (this.dying)
+            return;
+        
         this.v.y = 0;
         this.t.y = (y+h*o.y)+h - this.t.h*this.t.o.y;
     }
     collideBottomA({y,h,o})
     {
+        if (this.dying)
+            return;
+        
         this.v.y = 0;
         this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
         this.grounded = true;
@@ -708,33 +724,54 @@ class Player extends Physics
     }
     collideLeftA({x,w,o})
     {
+        if (this.dying)
+            return;
+        
         this.v.x = 0;
         this.t.x = (x+w*o.x)+w - this.t.w*this.t.o.x+0.01;
     }
     collideRightA({x,w,o})
     {
+        if (this.dying)
+            return;
+
         this.v.x = 0;
         this.t.x = (x+w*o.x) - this.t.w - this.t.w*this.t.o.x-0.01;
     }
 
     Death()
     {
-        console.log("YOU FUCKING DIED!");
+        this.dying = true;
+        this.gravityMultiplier = 0;
+        this.v.y = 1;
+        this.direction = 0;
+        for (let i = 0; i < this.bullets.length; i++)
+        {
+            this.bullets[i].explode();
+        }
     }
 
     lateUpdate()
     {
+        for (const bullet of this.bullets)
+        {
+            bullet.update();
+        }
+
+        if (this.dying)
+        {
+            console.log(this.alpha)
+            this.alpha *= 0.99;
+            if (this.alpha < 0.1) this.alpha = 0;
+            return;
+        }
+
         if (this.lastHit > 0)
             this.lastHit--;
         else if (this.hardDmg > 0)
             this.hardDmg-=0.05;
         this.sword.update();
         this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
-
-        for (const bullet of this.bullets)
-        {
-            bullet.update();
-        }
     }
 
     updateMore()
@@ -751,6 +788,12 @@ class Player extends Physics
 
     renderMore()
     {
+        if (this.dying)
+            return;
+
+        this.ro.y = (Math.sin(this.sinRo)-0.5)*8;
+        this.sinRo+=Math.PI/engine.fps;
+
         for (let i = 0; i < this.bullets.length; i++)
         {
             if (!this.bullets[i].active)

@@ -19,6 +19,10 @@ const update = () =>
         display.stacks = 0;
     }
 
+    if (BLOOD.length > 0)
+        for (let i = 0; i < BLOOD-0; i++)
+            BLOODGENERATORS[i].dying = true;
+
     for (const bloodGenerator of BLOODGENERATORS)
     {
         if (bloodGenerator.active)
@@ -77,6 +81,12 @@ const update = () =>
             {
                 for (const bullet of currentCtx.boss[0].bullets)
                     element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
+
+                if (currentCtx.boss[0].dying)
+                {
+                    if (PLAYER.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", currentCtx.boss[0], true).b) Mauriced();
+                    element.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", currentCtx.boss[0]);
+                }
             }
 
             for (const bullet of PLAYER.bullets)
@@ -180,7 +190,7 @@ const render = () =>
     display.render();
 };
 
-const engine = new Engine(30, update, render);
+const engine = new Engine(60, update, render);
 const display = new Display(canvas);
 
 engine.start();

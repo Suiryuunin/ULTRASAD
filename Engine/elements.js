@@ -12,6 +12,7 @@ class Rect
         this.ot = {x:x,y:y,w:w,h:h,o:o};
         this.c = c;
         this.oc = c;
+        this.ro = {x:0,y:0};
         this.hovering = false;
         this.visible = true;
         this.active = true;
@@ -34,6 +35,8 @@ class Rect
             }
             this.frame = initFrame;
         }
+        this.delay = 1;
+        this.delayC = 0;
     }
 
     updateFrameSet(frames)
@@ -49,15 +52,15 @@ class Rect
         this.frame = 0;
     }
     
-    checkCollision({l,r,t,b}, e)
+    checkCollision({l,r,t,b}, e, bypass)
     {
-        if (this.collision.r && !l)
+        if ((this.collision.r && !l) || bypass)
             l = e.collideLeft(this.t);
-        if (this.collision.l && !r)
+        if ((this.collision.l && !r) || bypass)
             r = e.collideRight(this.t);
-        if (this.collision.b && !t)
+        if ((this.collision.b && !t) || bypass)
             t = e.collideTop(this.t);
-        if (this.collision.t && !b)
+        if ((this.collision.t && !b) || bypass)
             b = e.collideBottom(this.t);
 
         return {l:l,r:r,t:t,b:b};
@@ -74,13 +77,13 @@ class Rect
             return e.circleCircle({x:this.center.x,y:this.center.y}, this.radius, this);
     }
 
-    updateCollision({l,r,t,b}, type = "rect/rect", exception = undefined)
+    updateCollision({l,r,t,b}, type = "rect/rect", exception = undefined, bypass = false)
     {
         if (type == "rect/rect")
         {
             if (exception != undefined)
             {
-                return this.checkCollision({l,r,t,b}, exception);
+                return this.checkCollision({l,r,t,b}, exception, bypass);
             }
             return this.checkCollision({l,r,t,b}, PLAYER);
         }
@@ -126,8 +129,21 @@ class Rect
 
             case "ani":
             {
-                display.drawImg(currentCtx, this.t, this.frameSet[this.frame], this.alpha, this.r, this.flip.x, this.flip.y);
-                this.frame = (this.frame+1)%this.frameSet.length;
+                const transform =
+                {
+                    x:this.t.x+this.ro.x,
+                    y:this.t.y+this.ro.y,
+                    w:this.t.w,
+                    h:this.t.h,
+                    o:this.t.o
+                }
+                display.drawImg(currentCtx, transform, this.frameSet[this.frame], this.alpha, this.r, this.flip.x, this.flip.y);
+                this.delayC++;
+                if (this.delayC == this.delay*engine.fps/30)
+                {
+                    this.frame = (this.frame+1)%this.frameSet.length;
+                    this.delayC = 0;
+                }
                 break;
             }
 

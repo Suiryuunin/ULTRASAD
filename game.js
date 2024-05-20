@@ -41,4 +41,9 @@ for (let i = 0; i < 3; i++)
 let PLAYER = new Player("ani", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},pFrames);
 PLAYER.name = "player";
 
+function Mauriced()
+{
+    PLAYER.dmg(12, {x:0,y:0},true);
+}
+
 document.addEventListener('contextmenu', event => event.preventDefault());
