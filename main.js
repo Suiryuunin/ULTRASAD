@@ -18,6 +18,14 @@ const update = () =>
         shakeReset = shakeDuration;
         display.stacks = 0;
     }
+
+    for (const bloodGenerator of BLOODGENERATORS)
+    {
+        if (bloodGenerator.active)
+            bloodGenerator.update();
+        else
+            BLOODGENERATORS.splice(BLOODGENERATORS.indexOf(bloodGenerator), 1);
+    }
     
     // Background
     for (const element of currentCtx.background)
@@ -80,6 +88,9 @@ const update = () =>
                 PLAYER.sword.hitbox.hitList.push(element);
                 PLAYER.sword.hitbox.hitList = [...new Set(PLAYER.sword.hitbox.hitList)];
             }
+
+            for (const blood of BLOOD)
+                element.updateCollision({l:false,r:false,t:false,b:false}, "rect/rect", blood);
         }
     }
 
@@ -97,6 +108,14 @@ const update = () =>
     {
         PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
         currentCtx.boss[0].updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
+    }
+
+    for (const blood of BLOOD)
+    {
+        if (blood.active)
+            blood.update();
+        else
+            BLOOD.splice(BLOOD.indexOf(blood), 1);
     }
 
     PLAYER.lateUpdate();
@@ -138,6 +157,11 @@ const render = () =>
         }
     }
 
+    for (const blood of BLOOD)
+    {
+        blood.render();
+    }
+
     for (const element of FOREGROUNDQUEUE)
     {
         element.render();
@@ -156,7 +180,7 @@ const render = () =>
     display.render();
 };
 
-const engine = new Engine(60, update, render);
+const engine = new Engine(30, update, render);
 const display = new Display(canvas);
 
 engine.start();

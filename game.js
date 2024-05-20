@@ -25,11 +25,20 @@ function toCanvasCoords(pageX, pageY)
     return {x, y};
 }
 let FOREGROUNDQUEUE = [];
+let BLOOD = [];
+let BLOODGENERATORS = [];
+
 const playerIMG = new Image(64, 128);
 playerIMG.src = "Assets/Textures/bg720p.jpg";
-let PLAYER = new Player("img", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},playerIMG);
+
+const _sP = "Assets/Characters/Player/Soul/soul000";
+const pFrames = [];
+for (let i = 0; i < 3; i++)
+{
+    pFrames.push(_sP+i+".png");
+}
+
+let PLAYER = new Player("ani", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},pFrames);
 PLAYER.name = "player";
 
-window.addEventListener("click", (e) => e.preventDefault());
-window.addEventListener("mousedown", (e) => e.preventDefault());
-window.addEventListener("mouseup", (e) => e.preventDefault());
+document.addEventListener('contextmenu', event => event.preventDefault());

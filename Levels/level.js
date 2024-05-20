@@ -36,7 +36,7 @@ let UI =
 function reset()
 {
     FOREGROUNDQUEUE = [];
-    PLAYER = new Player("img", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},playerIMG);
+    PLAYER = new Player("ani", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},pFrames);
     PLAYER.name = "player";
 
     currentCtx.background =

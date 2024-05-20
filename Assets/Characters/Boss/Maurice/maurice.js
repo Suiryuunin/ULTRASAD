@@ -45,6 +45,8 @@ class Bullet extends Dynamic
         
             if (d == 0) d = 1*(10**-64);
             const m = d/(d-Math.sign(d)*(this.t.w/4));
+            const _x = (this.center.x- (x/(d/(d-Math.sign(d)*(this.t.w/2)))) )+this.t.w*this.t.o.x+this.t.w/2;
+            const _y = (this.center.y- (y/(d/(d-Math.sign(d)*(this.t.w/2)))) )+this.t.h*this.t.o.y+this.t.h/2;
             x/=m;
             y/=m;
             
@@ -57,7 +59,7 @@ class Bullet extends Dynamic
                 if (e.boss) explosions.push(new Explosion(this.t, EXPLOSIONIMG));
                 else if (display.stacks < 4) display.stacks++;
                 
-                if (e.player) e.dmg(1);
+                if (e.player) e.dmg(1, {x:_x,y:_y});
             }
             else
             {
@@ -210,9 +212,13 @@ class Maurice extends Dynamic
         this.attackPhase = 0;
     }
 
-    dmg(dmg)
+    dmg(dmg, {x,y}, explosion = false)
     {
         this.hp -= dmg;
+        if (explosion)
+            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, 4, 0.7, 10,12, true));
+        else
+            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, 64, 0.7, 10,12));
     }
 
     update()

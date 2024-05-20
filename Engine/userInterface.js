@@ -19,7 +19,7 @@ class Button extends Dynamic
             document.addEventListener("mousemove", (e) =>
             {
                 const p = toCanvasCoords(e.clientX, e.clientY);
-                if (!this.isOCollidingWith({x:p.x, y:p.y, w:0, h:0}))
+                if (!this.isOCollidingWith({x:p.x, y:p.y, w:0, h:0, o:{x:-0.5,y:-0.5}}))
                 {
                     this.hovering = false;
                     this.c = this.oc;
@@ -43,7 +43,7 @@ class Button extends Dynamic
             document.addEventListener("mousedown", (e) =>
             {
                 const p = toCanvasCoords(e.clientX, e.clientY);
-                if (this.isCollidingWith({x:p.x, y:p.y, w:0, h:0}) && this.canClick)
+                if (this.isCollidingWith({x:p.x, y:p.y, w:0, h:0, o:{x:-0.5,y:-0.5}}) && this.canClick)
                 {
                     this.c = this.cc;
                     this.scaleBy(cs);
@@ -53,7 +53,7 @@ class Button extends Dynamic
             document.addEventListener("mouseup", (e) =>
             {
                 const p = toCanvasCoords(e.clientX, e.clientY);
-                if (this.action != undefined && this.isOCollidingWith({x:p.x, y:p.y, w:0, h:0}))
+                if (this.action != undefined && this.isOCollidingWith({x:p.x, y:p.y, w:0, h:0, o:{x:-0.5,y:-0.5}}))
                 {
                     if (this.canClick || this.canHover)
                     {

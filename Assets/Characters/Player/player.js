@@ -70,6 +70,7 @@ class Sword extends Dynamic
         this.hitbox.sword = this;
         this.hitbox.hitList = [];
         this.hitbox.direction = "x";
+        this.hitbox.directionY = 0;
         this.hitbox.updateMore = function()
         {
             if (!this.active)
@@ -88,16 +89,16 @@ class Sword extends Dynamic
             if (this.sword.player.frozenDirection > 0)
                 ox = 0;
             let oy = -1; 
-            if (this.sword.directionY > 0)
+            if (this.directionY > 0)
                 oy = 0;
 
             this.t =
             {
                 x: this.sword.t.x,
                 y: this.sword.t.y,
-                w: this.sword.directionY != 0 ? this.sword.swordAura.t.w : this.sword.swordAura.t.h,
-                h: this.sword.directionY != 0 ? this.sword.swordAura.t.h : this.sword.swordAura.t.w,
-                o: this.sword.directionY != 0 ? {x:this.sword.st.o.x, y:oy} : {x:ox, y:this.sword.st.o.x}
+                w: this.directionY != 0 ? this.sword.swordAura.t.w : this.sword.swordAura.t.h,
+                h: this.directionY != 0 ? this.sword.swordAura.t.h : this.sword.swordAura.t.w,
+                o: this.directionY != 0 ? {x:this.sword.st.o.x, y:oy} : {x:ox, y:this.sword.st.o.x}
             };
             
             this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
@@ -140,7 +141,8 @@ class Sword extends Dynamic
             if (element.hp != undefined)
             {
                 const dmg = this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16;
-                element.hp-=dmg;
+                element.dmg(dmg, {x:0,y:0});
+                engine.stopQueued = dmg/15*500;
                 this.sword.player.hp += (this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16)/15*(this.sword.player.maxHp-this.sword.player.hp - this.sword.player.hardDmg);
             }
 
@@ -245,7 +247,9 @@ class Sword extends Dynamic
         this.stabCooling = 0;
         this.stabbingTimeLeft = 0;
         this.swordAura.t.h += this.stabCharge/this.maxStabCharge*this.swordAura.t.h;
+        this.swordAura.peakH = this.swordAura.t.h;
         this.hitbox.direction = this.directionY == 0 ? "x" : "y";
+        this.hitbox.directionY = this.directionY;
 
         this.player.shield = false;
         for (const bullet of this.player.bullets)
@@ -363,9 +367,12 @@ class Sword extends Dynamic
                 this.hitbox.active = true;
             this.stabbingTimeLeft++;
             this.moveBy(this.stabStep);
+            
             if (this.stabbingTimeLeft == this.stabbingTime)
             {
                 this.stabCharge = 0;
+                this.hitbox.active = false;
+                this.hitbox.hit();
                 this.swordAura.t.h = this.auraInitHeight;
                 this.justStoppedStabbing = true;
             }
@@ -376,8 +383,6 @@ class Sword extends Dynamic
             this.t.w = 16;
             this.t.h = 128;
             this.t.o = this.st.o = {x:-0.5,y:-1};
-            this.hitbox.active = false;
-            this.hitbox.hit();
             this.justStoppedStabbing = false;
         }
         this.r = this.player.frozenDirection * 70;
@@ -436,7 +441,7 @@ class Sword extends Dynamic
 
 class Player extends Physics
 {
-    constructor(type = "img", {x,y,w,h,o}, c)
+    constructor(type = "ani", {x,y,w,h,o}, c)
     {
         super(type, {x,y,w,h,o}, c, _NOCOLLISION);
 
@@ -493,7 +498,7 @@ class Player extends Physics
             "KeyK": false
         }
 
-        this.dashDuration = 2; this.dashTimer = this.dashDuration; this.dashing = false; this.canDash = false; this.dashCooldown = 0;
+        this.dashDuration = 2; this.dashTimer = this.dashDuration; this.dashing = false; this.canDash = false; this.dashCooldown = 0; this.airDashLeft = 1;
 
         this.shifting = false;
 
@@ -550,18 +555,24 @@ class Player extends Physics
                 this.keys[code] = false;
             }
         });
+        console.log(this)
     }
 
-    dmg(dmg)
+    dmg(dmg, {x,y}, explosion = false)
     {
         this.hp -= dmg;
         this.hardDmg += dmg/2;
         this.lastHit = 128;
+
+        if (explosion)
+            BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, 16, 0.7, 6,8, true));
+        else
+            BLOODGENERATORS.push(new BloodGenerator({x:x+(Math.random()-0.5)*16,y:y+32}, 32, 0.7, 6, 8));
     }
 
     startDash()
     {
-        if (this.dashCooldown == 0)
+        if (this.dashCooldown == 0 && this.airDashLeft != 0)
         {
             this.maxV.x = 96;
             this.speed = 64;
@@ -572,6 +583,7 @@ class Player extends Physics
             this.gravityMultiplier = 0;
 
             this.canDash = false;
+            this.airDashLeft--;
             this.dashCooldown = 16;
         }
         
@@ -618,6 +630,8 @@ class Player extends Physics
             this.dashCooldown--;
         if (!this.grounded)
             this.dashCooldown = 0;
+        if (this.grounded)
+            this.airDashLeft = 1;
     }
 
     updateMiscPhysics()
@@ -663,6 +677,7 @@ class Player extends Physics
         if (this.direction != 0)
         {
             this.frozenDirection = this.direction;
+            this.flip.x = this.direction;
 
             this.v.x = this.grounded ? this.v.x + this.direction * this.speed : this.v.x + this.direction * this.speed * this.airControl;
             if (Math.abs(this.v.x) > this.maxV.x)
