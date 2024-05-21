@@ -217,6 +217,7 @@ class Maurice extends Dynamic
         this.enraged = false;
         this.dying = false;
         this.grounded = false;
+        this.firstSlam = false;
         this.gravityMultiplier = 0.01;
 
         this.attackPhase = 0;
@@ -236,6 +237,12 @@ class Maurice extends Dynamic
         this.v.y = 0;
         this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
         this.grounded = true;
+        if (!this.firstSlam)
+        {
+            display.stacks += 12;
+            shakeReset = 64;
+            this.firstSlam = true;
+        }
     }
 
     update()
@@ -258,6 +265,8 @@ class Maurice extends Dynamic
         if (this.hp <= 0)
         {
             this.dmg(128,{x:0,y:0});
+            display.stacks += 12;
+            shakeReset = 64;
             this.dying = true;
         }
         if (this.hp <= this.maxHp/2 && !this.enraged)

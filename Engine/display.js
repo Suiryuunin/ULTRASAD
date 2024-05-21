@@ -146,14 +146,13 @@ class Display
         this.display.drawImage(currentCtx.canvas,
             0, 0,
             currentCtx.canvas.width, currentCtx.canvas.height,
-            shakePos.x,
-            shakePos.y,
+            shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);
         
         this.display.drawImage(BLOODCTX.canvas,
             0, 0,
             BLOODCTX.canvas.width, BLOODCTX.canvas.height,
-            0, 0,
+            shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);
     }
 }

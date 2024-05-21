@@ -46,7 +46,7 @@ PLAYER.name = "player";
 
 function Mauriced()
 {
-    PLAYER.dmg(12, {x:0,y:0},true);
+    PLAYER.dmg(75, {x:0,y:0},true);
 }
 
 document.addEventListener('contextmenu', event => event.preventDefault());

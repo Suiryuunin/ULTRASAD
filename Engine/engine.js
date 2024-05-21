@@ -1,4 +1,4 @@
-function drawSword()
+function drawSword(dmg)
 {
     display.drawImg(currentCtx,
         {
@@ -18,7 +18,10 @@ function drawSword()
         h:PLAYER.sword.st.h,
         o:PLAYER.sword.st.o
     }, PLAYER.sword.c, 1, PLAYER.sword.r);
-    display.render(); 
+    display.render();
+
+    display.stacks += 12 * (dmg/500);
+    shakeReset = 32 * (dmg/500);
 }
 
 class Engine
@@ -46,7 +49,7 @@ class Engine
                 this.update();
                 if (this.stopQueued != 0)
                 {
-                    drawSword();
+                    drawSword(this.stopQueued);
                     this.stop();
                     setTimeout(() => {
                         this.start();
@@ -64,7 +67,7 @@ class Engine
                 this.update();
                 if (this.stopQueued != 0)
                 {
-                    drawSword();
+                    drawSword(this.stopQueued);
                     this.stop();
                     setTimeout(() => {
                         this.start();

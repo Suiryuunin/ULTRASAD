@@ -27,6 +27,14 @@ class Sword extends Dynamic
 
         this.player = player;
 
+        this.idle = true;
+        this.delay = 4;
+        this.delayC = 0;
+        this.frame = 0;
+        this.roS = {x:0,y:0}
+        this.sinRo = Math.PI/3;
+        this.sinRoS = Math.PI/3*2;
+
         this.stabbing = false;
         this.stabbingTime = this.stabbingTimeLeft = 4;
         this.stabCooldown = this.stabCooling = 8;
@@ -211,6 +219,7 @@ class Sword extends Dynamic
 
     charge()
     {
+        this.idle = false;
         if (this.stabCharge < this.maxStabCharge)
         {
             this.stabCharge++;
@@ -385,8 +394,9 @@ class Sword extends Dynamic
             this.t.o = this.st.o = {x:-0.5,y:-1};
             this.justStoppedStabbing = false;
         }
-        this.r = this.player.frozenDirection * 70;
-        this.t.x = this.player.t.x + -this.player.frozenDirection * 64;
+        this.idle = true;
+        this.r = this.player.frozenDirection * 80;
+        this.t.x = this.player.t.x + -this.player.frozenDirection * 160;
         this.t.y = this.player.t.y + 64;
     }
     render()
@@ -420,6 +430,43 @@ class Sword extends Dynamic
 
         if (this.renderMore != undefined)
             this.renderMore();
+    }
+
+    renderMore()
+    {
+        this.ro.y = (Math.sin(this.sinRo)-0.5)*4;
+        this.roS.y = (Math.sin(this.sinRoS)-0.5)*4;
+        this.sinRo+=Math.PI/engine.fps;
+        this.sinRoS+=Math.PI/engine.fps;
+
+        // Hand Shield
+        const transformS = 
+        {
+            x:this.t.x + (this.chargingStab ? 108*this.player.frozenDirection : (this.idle ? 116*this.player.frozenDirection : 0))+this.ro.x,
+            y:this.t.y - (this.chargingStab ? 48 : (this.idle ? -16 : 0))+this.roS.y,
+            w:64/2,
+            h:128/2,
+            o:this.st.o
+        };
+        display.drawImg(currentCtx, transformS, this.player.frameSet[this.frame], this.player.alpha, this.player.r, this.player.flip.x, this.player.flip.y);
+
+        // Hand Sword
+        const transform = 
+        {
+            x:this.t.x + (this.idle ? 216*this.player.frozenDirection : 0),
+            y:this.t.y - (this.idle ? 8 : 32)+this.ro.y,
+            w:64/2,
+            h:128/2,
+            o:this.st.o
+        };
+        display.drawImg(currentCtx, transform, this.player.frameSet[this.frame], this.player.alpha, this.player.r, this.player.flip.x, this.player.flip.y);
+
+        this.delayC++;
+        if (this.delayC == this.delay*engine.fps/30)
+        {
+            this.frame = (this.frame+1)%this.player.frameSet.length;
+            this.delayC = 0;
+        }
     }
 }
 
@@ -665,6 +712,7 @@ class Player extends Physics
     {
         if (this.hp <= 0 && !this.dying)
         {
+            this.dmg(64, {x:0,y:0},true);
             this.Death();
         }
 
@@ -765,7 +813,6 @@ class Player extends Physics
 
         if (this.dying)
         {
-            console.log(this.alpha)
             this.alpha *= 0.99;
             if (this.alpha < 0.1) this.alpha = 0;
             return;

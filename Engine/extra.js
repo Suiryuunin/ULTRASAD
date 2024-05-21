@@ -67,6 +67,10 @@ class Blood extends Physics
         this.t.w+=this.t.w*size;
         this.t.h+=this.t.h*size;
         this.t.w = this.t.h = this.t.w + (Math.random()-0.5)*this.t.w;
+        this.w = this.t.w*1;
+        this.h = this.t.h*1;
+        this.t.w = 0;
+        this.t.h = 0;
         this.r = Math.random()*360;
         this.alpha = 0.2;
     }
@@ -75,10 +79,17 @@ class Blood extends Physics
     {
         this.gravityMultiplier = 0;
         this.v = {x:0,y:0};
-        this.t.h *= 0.5;
-        this.t.w *= 0.5;
+        this.h *= 0.5;
+        this.w *= 0.5;
         this.active = false;
-        display.drawImg(BLOODCTX, this.t, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
+        display.drawImg(BLOODCTX,
+        {
+            x:this.t.x,
+            y:this.t.y,
+            w:this.w,
+            h:this.h,
+            o:this.t.o
+        }, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
     }
 
     collideTopA({y,h,o})
@@ -99,7 +110,13 @@ class Blood extends Physics
     }
     render()
     {
-        display.drawImg(currentCtx, this.t, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
+        display.drawImg(currentCtx, {
+            x:this.t.x,
+            y:this.t.y,
+            w:this.w,
+            h:this.h,
+            o:this.t.o
+        }, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
     }
 }
 
