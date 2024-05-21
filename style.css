@@ -10,3 +10,9 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+@font-face {
+    font-family: VCR_OSD;
+    font-weight: bold;
+    src: url(Assets/VCR_OSD.ttf);
+}

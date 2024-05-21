@@ -76,7 +76,7 @@ class Button extends Dynamic
 
 class HealthBar extends Dynamic
 {
-    constructor({x,y,w,h,o},target, c = "red", c2 = "#ff9438", c3 = "black", collision = _NOCOLLISION)
+    constructor({x,y,w,h,o},target, c = "red", c2 = "#ff9438", c3 = "black", name = "", collision = _NOCOLLISION)
     {
         super("color", {x,y,w,h,o}, c, collision);
         this.target = target;
@@ -84,6 +84,7 @@ class HealthBar extends Dynamic
         this.initHp = target.hp;
         this.c2 = c2;
         this.c3 = c3;
+        this.name = name
         this.ut =
         {
             x:this.t.x,
@@ -117,9 +118,11 @@ class HealthBar extends Dynamic
     }
     render()
     {
+        display.drawRect(currentCtx, this.ot, "black", 1, "fill");
         display.drawRect(currentCtx, this.ut, this.c2, 1, "fill");
         display.drawRect(currentCtx, this.t, this.c, 1, "fill");
         display.drawRect(currentCtx, this.ht, "gray", 1, "fill");
-        display.drawRect(currentCtx, this.ot, this.c3, 1, "border", 8);
+        display.drawRect(currentCtx, {x:this.t.x+this.ot.w*this.t.o.x+this.ot.w/2,y:this.t.y, w:this.ot.w+16,h:this.ot.h+16, o:{x:-0.5,y:-0.5}}, this.c3, 0.5, "border", 16);
+        display.drawWord(currentCtx, {word:[this.name], x:this.t.x+this.ot.w*this.t.o.x+this.ot.w/2,y:this.t.y, o:{x:-0.5,y:-0.5}, border:false, size:this.t.h, color:"white"});
     }
 }

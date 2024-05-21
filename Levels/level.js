@@ -29,8 +29,8 @@ ALL.push(...currentCtx.background, ...currentCtx.boss, ...currentCtx.foreground)
 
 let UI =
 [
-    new HealthBar({x:256, y:64, w:res.w-512, h:64, o:{x:0, y:-0.5}}, currentCtx.boss[0]),
-    new HealthBar({x:64, y:res.h-64, w:512, h:64, o:{x:0, y:-0.5}}, PLAYER, "red", "#ff9438", "white")
+    new HealthBar({x:256, y:64, w:res.w-512, h:64, o:{x:0, y:-0.5}}, currentCtx.boss[0], "red", "#ff9438", "black", "MAURICE PRIME"),
+    new HealthBar({x:64, y:res.h-64, w:512, h:64, o:{x:0, y:-0.5}}, PLAYER, "red", "#ff9438", "black", "V1'S SOUL")
 ];
 
 function reset()

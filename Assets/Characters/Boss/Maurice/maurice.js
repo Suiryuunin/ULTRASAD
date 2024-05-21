@@ -202,7 +202,7 @@ class Maurice extends Dynamic
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
-        this.hp = this.maxHp = 15;
+        this.hp = this.maxHp = 75;
         this.player = player;
 
         this.bulletCooldownTime = this.bulletCooldown = 4;
