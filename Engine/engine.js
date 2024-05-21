@@ -21,7 +21,7 @@ function drawSword(dmg)
     display.render();
 
     display.stacks += 12 * (dmg/500);
-    shakeReset = 32 * (dmg/500);
+    shakeReset = Math.round(32 * (dmg/500));
 }
 
 class Engine

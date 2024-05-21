@@ -264,7 +264,7 @@ class Maurice extends Dynamic
         }
         if (this.hp <= 0)
         {
-            this.dmg(128,{x:0,y:0});
+            this.dmg(75,{x:0,y:0});
             display.stacks += 12;
             shakeReset = 64;
             this.dying = true;
