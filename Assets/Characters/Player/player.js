@@ -166,9 +166,40 @@ class Sword extends Dynamic
         this.chargeAni = [new Rect("ani", this.t, frames, _NOCOLLISION), new Rect("ani", this.t, frames, _NOCOLLISION, 2),new Rect("ani", this.t, frames, _NOCOLLISION,5)];
         this.chargeConcentration = 1;
 
+        this.clicking = false;
+
+        window.addEventListener("mousedown", () =>
+        {
+            if (this.keys["KeyJ"] || this.clicking)
+                return;
+            this.keys["KeyJ"] = true;
+
+            if (this.stabCooldown == this.stabCooling)
+            {
+                this.t.o = this.st.o = {x:-0.5, y:0};
+                this.chargingStab = true;
+                this.player.shield = true;
+                return;
+            }
+            this.chargeQueued = true;
+        });
+
+        window.addEventListener("mouseup", () =>
+        {
+            if (!this.keys["KeyJ"] || this.clicking)
+                return;
+            this.keys["KeyJ"] = false;
+            
+            if (this.stabCooldown == this.stabCooling)
+                this.stab();
+
+            if (this.chargeQueued)
+                this.chargeQueued = false;
+        });
+
         window.addEventListener(("keydown"), (e) =>
         {
-            if (this.keys[e.code])
+            if (this.keys[e.code] || this.clicking)
                 return;
             this.keys[e.code] = true;
 
@@ -195,7 +226,7 @@ class Sword extends Dynamic
 
         window.addEventListener("keyup", (e) =>
         {
-            if (!this.keys[e.code])
+            if (!this.keys[e.code] || this.clicking)
                 return;
             this.keys[e.code] = false;
 
@@ -540,7 +571,7 @@ class Player extends Physics
         this.axisMapping = {
             "KeyA":-1,
             "KeyD": 1,
-            "KeyK": 0,
+            "KeyK": 0
         }
         this.keys = {
             "KeyA": false,
@@ -558,6 +589,8 @@ class Player extends Physics
                 return "KeyA";
             if (code == "ArrowRight")
                 return "KeyD";
+            if (code == "Space")
+                return "KeyK";
             if (this.keys[code] != undefined)
                 return code;
             return "urmom";

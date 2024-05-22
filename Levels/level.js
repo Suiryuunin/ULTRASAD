@@ -1,22 +1,27 @@
-const currentCtx = document.createElement("canvas").getContext("2d");
+"use strict";
+
+const bossRoom = document.createElement("canvas").getContext("2d");
 
 const bg = new Image();
 bg.src = "Assets/Textures/bg1080p.jpg";
 
-currentCtx.background =
+bossRoom.background =
 [
     new Box({x:0,y:0,w:res.w,h:res.h,o:_NOOFFSET}, "lightgray", _NOCOLLISION),
     new Box({x:_VCENTER.x, y:res.h, w:res.w, h:128, o:{x:-0.5,y:-1}}, "black"),
-    new Box({x:_VCENTER.x, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, "green", _PLATFORM),
+    // new Box({x:_VCENTER.x, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, "green", _PLATFORM),
+    // new Box({x:_VCENTER.x, y:512, w:128, h:32, o:{x:-0.5,y:-0.5}}, "green", _PLATFORM),
     new Box({x:_VCENTER.x+512, y:res.h-128, w:96, h:128, o:{x:-0.5,y:-1}}, "Red")
 ];
-currentCtx.boss =
+bossRoom.boss =
 [
-    new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, playerIMG, _BLOCKALL, PLAYER)
+    // new Maurice({x:_VCENTER.x-256, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, playerIMG, _BLOCKALL, PLAYER),
+    new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, playerIMG, _BLOCKALL, PLAYER),
+    // new Maurice({x:_VCENTER.x+256, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, playerIMG, _BLOCKALL, PLAYER)
 ]
-currentCtx.foreground =
+bossRoom.foreground =
 [
-    new Box({x:_VCENTER.x+128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, "hotpink", _PLATFORM),
+    // new Box({x:_VCENTER.x+128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, "hotpink", _PLATFORM),
 ];
 
 let DYNAMIC =
@@ -24,50 +29,21 @@ let DYNAMIC =
     PLAYER
 ];
 
-let ALL = [];
+currentCtx = bossRoom;
+
+ALL = [];
 ALL.push(...currentCtx.background, ...currentCtx.boss, ...currentCtx.foreground);
 
-let UI =
+UI =
 [
-    new HealthBar({x:256, y:64, w:res.w-512, h:64, o:{x:0, y:-0.5}}, currentCtx.boss[0], "red", "#ff9438", "black", "MAURICE PRIME"),
-    new HealthBar({x:64, y:res.h-64, w:512, h:64, o:{x:0, y:-0.5}}, PLAYER, "red", "#ff9438", "black", "V1'S SOUL")
+    new HealthBar({x:64, y:res.h-64, w:512, h:64, o:{x:0, y:-0.5}}, PLAYER, "red", "#ff9438", "black", "V1'S SOUL"),
 ];
 
-function reset()
+let count = 0;
+for (const boss of currentCtx.boss)
 {
-    FOREGROUNDQUEUE = [];
-    PLAYER = new Player("ani", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},pFrames);
-    PLAYER.name = "player";
-
-    currentCtx.background =
-    [
-        new Box({x:0,y:0,w:res.w,h:res.h,o:_NOOFFSET}, "lightgray", _NOCOLLISION),
-        new Box({x:_VCENTER.x, y:res.h, w:res.w, h:128, o:{x:-0.5,y:-1}}, "black"),
-        new Box({x:_VCENTER.x, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, "green", _PLATFORM),
-        new Box({x:_VCENTER.x+512, y:res.h-128, w:96, h:128, o:{x:-0.5,y:-1}}, "Red")
-    ];
-    currentCtx.boss =
-    [
-        new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, playerIMG, _BLOCKALL, PLAYER)
-    ]
-    currentCtx.foreground =
-    [
-        new Box({x:_VCENTER.x+128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, "hotpink", _PLATFORM),
-    ];
-
-    DYNAMIC =
-    [
-        PLAYER
-    ];
-
-    ALL = [];
-    ALL.push(...currentCtx.background, ...currentCtx.boss, ...currentCtx.foreground);
-
-    UI =
-    [
-        new HealthBar({x:256, y:64, w:res.w-512, h:64, o:{x:0, y:-0.5}}, currentCtx.boss[0]),
-        new HealthBar({x:64, y:res.h-64, w:512, h:64, o:{x:0, y:-0.5}}, PLAYER, "red", "#ff9438", "white")
-    ];
+    UI.push(new HealthBar({x:256, y:64+count*48, w:res.w-512, h:64, o:{x:0, y:-0.5}}, boss, "red", "#ff9438", "black", boss.name));
+    count++;
 }
 
 

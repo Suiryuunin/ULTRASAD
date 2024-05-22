@@ -6,8 +6,7 @@ class Maurice extends Dynamic
 
         this.boss = true;
         this.name = "MAURICE PRIME"
-        this.hp = 40
-        this.maxHp = 75;
+        this.hp = this.maxHp = 15;
         this.player = player;
 
         this.bulletCooldownTime = this.bulletCooldown = 4;
@@ -24,7 +23,6 @@ class Maurice extends Dynamic
         this.grounded = false;
         this.firstSlam = false;
         this.gravityMultiplier = 0.01;
-        this.groundedThisFrame = false;
 
         this.attackPhase = 0;
     }
@@ -43,7 +41,6 @@ class Maurice extends Dynamic
         this.v.y = 0;
         this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
         this.grounded = true;
-        this.groundedThisFrame = true;
         if (!this.firstSlam)
         {
             display.stacks += 12;

@@ -24,12 +24,26 @@ function toCanvasCoords(pageX, pageY)
 
     return {x, y};
 }
+
+let currentCtx = document.createElement("canvas").getContext("2d");
+currentCtx.background = [];
+currentCtx.boss = [];
+currentCtx.foreground = [];
+let ALL = [];
+let UI = [];
+const UICTX = document.createElement("canvas").getContext("2d");
+UICTX.canvas.width = res.w;
+UICTX.canvas.height = res.h;
+
 let FOREGROUNDQUEUE = [];
 let BLOOD = [];
 const BLOODCTX = document.createElement("canvas").getContext("2d");
 BLOODCTX.canvas.width = res.w;
 BLOODCTX.canvas.height = res.h;
 let BLOODGENERATORS = [];
+const DARKCTX = document.createElement("canvas").getContext("2d");
+DARKCTX.canvas.width = res.w;
+DARKCTX.canvas.height = res.h;
 
 const playerIMG = new Image(64, 128);
 playerIMG.src = "Assets/Textures/bg720p.jpg";
@@ -47,6 +61,7 @@ PLAYER.name = "player";
 function Mauriced()
 {
     PLAYER.dmg(75, {x:0,y:0},true);
+    console.log("eh")
 }
 
 document.addEventListener('contextmenu', event => event.preventDefault());

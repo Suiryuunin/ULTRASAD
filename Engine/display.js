@@ -8,6 +8,7 @@ class Display
     {
 
         this.display = canvas.getContext("2d");
+        this.canvas = canvas;
         
         this.settings = document.createElement("canvas").getContext("2d");
         
@@ -16,6 +17,7 @@ class Display
         this.shakeStr = 8;
         this.stacks = 0;
         this.camShake = 0;
+        this.downscale = 3;
     }
 
     drawBackground(ctx, color = "black")
@@ -127,23 +129,33 @@ class Display
     {
         if (h / w > ratio)
         {
-            this.display.canvas.height = w * ratio;
-            this.display.canvas.width = w;
+            this.display.canvas.height = Math.ceil(w * ratio/this.downscale);
+            this.display.canvas.width =  Math.ceil(w/this.downscale);
         }
         else
         {
-            this.display.canvas.height = h;
-            this.display.canvas.width = h / ratio;
+            this.display.canvas.height = Math.ceil(h/this.downscale);
+            this.display.canvas.width =  Math.ceil(h / ratio/this.downscale);
         }
+        this.canvas.style.transform = "translate(-50%, -50%)scale("+this.downscale+"00%)";
     }
 
     render()
     {
+        this.display.imageSmoothingEnabled = false;
+
         const shakePos =
         {
-            x: (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake),
-            y: (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake)
+            x: (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake)/this.downscale,
+            y: (Math.random()-0.5)*this.stacks+Math.round((Math.random()-0.5)*this.shakeStr*this.camShake)/this.downscale
         }
+
+        if (Math.abs(shakePos.x) > 8/this.downscale*2)
+            shakePos.x = Math.sign(shakePos.x)*8/this.downscale**2;
+
+        if (Math.abs(shakePos.y) > 8/this.downscale*2)
+            shakePos.y = Math.sign(shakePos.y)*8/this.downscale**2;
+
         this.display.drawImage(currentCtx.canvas,
             0, 0,
             currentCtx.canvas.width, currentCtx.canvas.height,
@@ -153,6 +165,12 @@ class Display
         this.display.drawImage(BLOODCTX.canvas,
             0, 0,
             BLOODCTX.canvas.width, BLOODCTX.canvas.height,
+            shakePos.x, shakePos.y,
+            this.display.canvas.width, this.display.canvas.height);
+
+        this.display.drawImage(DARKCTX.canvas,
+            0, 0,
+            DARKCTX.canvas.width, DARKCTX.canvas.height,
             shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);
     }

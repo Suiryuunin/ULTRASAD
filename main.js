@@ -62,7 +62,13 @@ const update = () =>
         element.update();
     }
 
-    // Background
+    // Collisions
+
+    for (const boss of currentCtx.boss)
+    {
+        boss.groundedThisFrame = false;
+    }
+
     let colliding = {l:false,r:false,t:false,b:false};
     for (const element of ALL)
     {
@@ -75,13 +81,16 @@ const update = () =>
             
             if (!element.boss)
             {
-                for (const bullet of currentCtx.boss[0].bullets)
-                    element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
-
-                if (currentCtx.boss[0].dying)
+                for (const boss of currentCtx.boss)
                 {
-                    element.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", currentCtx.boss[0]);
-                    if (!currentCtx.boss[0].grounded && PLAYER.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", currentCtx.boss[0], true).b) Mauriced();
+                    for (const bullet of boss.bullets)
+                        element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
+
+                    if (boss.dying && !boss.groundedThisFrame)
+                    {
+                        element.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", boss);
+                        if (!boss.grounded && PLAYER.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", boss, true).b) Mauriced();
+                    }
                 }
             }
 
@@ -100,20 +109,25 @@ const update = () =>
         }
     }
 
-    for (const bullet of currentCtx.boss[0].bullets)
+    for (const boss of currentCtx.boss)
     {
-        for (const pbullet of PLAYER.bullets)
+        for (const bullet of boss.bullets)
         {
-            if (pbullet.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet)) break;
+            for (const pbullet of PLAYER.bullets)
+            {
+                if (pbullet.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet)) break;
+            }
+            if (!PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet) && !PLAYER.shield)
+                PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
         }
-        if (!PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/circle", bullet) && !PLAYER.shield)
-            PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
     }
+    
 
     for (const explosion of explosions)
     {
         PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
-        currentCtx.boss[0].updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
+        for (const boss of currentCtx.boss)
+            boss.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
     }
 
     for (const blood of BLOOD)
