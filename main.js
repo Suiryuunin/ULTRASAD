@@ -21,12 +21,6 @@ const update = () =>
         shakeReset = shakeDuration;
         display.stacks = 0;
     }
-    if (musicReset > 0)
-        musicReset--;
-    if (musicReset == 0)
-    {
-        Battle01.volume = 1;
-    }
 
     for (let i = 0; i < BLOODGENERATORS.length; i++)
     {
