@@ -6,7 +6,7 @@ class Maurice extends Dynamic
 
         this.boss = true;
         this.name = "MAURICE PRIME"
-        this.hp = 40
+        this.hp = 75
         this.maxHp = 75;
         this.player = player;
 
@@ -21,9 +21,12 @@ class Maurice extends Dynamic
         this.target = {x:0,y:0};
         this.enraged = false;
         this.dying = false;
+        this.dead = false;
+
+
         this.grounded = false;
         this.firstSlam = false;
-        this.gravityMultiplier = 0.01;
+        this.gravityMultiplier = 5;
         this.groundedThisFrame = false;
 
         this.attackPhase = 0;
@@ -38,7 +41,7 @@ class Maurice extends Dynamic
             BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12));
     }
 
-    collideBottomA({y,h,o})
+    collideBottomA({y,h,o}, e)
     {
         this.v.y = 0;
         this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
@@ -61,9 +64,11 @@ class Maurice extends Dynamic
         }
         if (this.dying)
         {
-            this.gravityMultiplier *= 1.5;
             if (!this.grounded)
+            {
                 this.v.y += _GRAVITY*this.gravityMultiplier;
+                if (this.isCollidingWith(this.player.t)) Mauriced();
+            }
             this.t.y -= this.v.y;
             this.t.x += this.v.x;
             this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
@@ -88,6 +93,7 @@ class Maurice extends Dynamic
         if (PLAYER.dying)
             return;
 
+
         if (this.cooling >= this.cooldown)
         {
             if (this.charging)
@@ -100,7 +106,7 @@ class Maurice extends Dynamic
                 }
                 else
                 {
-                    this.bullets.push(new Bullet(this.t, BulletPIMG, _NOCOLLISION, this.target, this, true));
+                    this.bullets.push(new Bullet(this.t, _BulletPIMG, _NOCOLLISION, this.target, this, true));
                     FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
                     this.cooling = 0;
                 }
@@ -120,7 +126,7 @@ class Maurice extends Dynamic
             if (this.bulletCooldown >= this.bulletCooldownTime)
             {
                 this.bulletCooldown = 0;
-                this.bullets.push(new Bullet(this.t, BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
+                this.bullets.push(new Bullet(this.t, _BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
                 FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
             }
             else
@@ -150,9 +156,15 @@ class Maurice extends Dynamic
         {
             if (!this.bullets[i].active)
             {
-                FOREGROUNDQUEUE.splice(FOREGROUNDQUEUE.indexOf(this.bullets[i]), 1);
                 this.bullets.splice(i,1);
             }
         }
     }
+}
+
+// MAURICED
+
+function Mauriced()
+{
+    PLAYER.dmg(75, {x:0,y:0},true);
 }

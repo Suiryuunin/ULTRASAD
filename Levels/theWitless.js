@@ -23,5 +23,3 @@ THEWITLESS.switch = function()
     currentCtx.canvas.width = res["w"];
     currentCtx.canvas.height = res["h"];
 }
-
-window.addEventListener("click", () => THEWITLESS.switch())

@@ -1,30 +1,52 @@
-class Maurice extends Dynamic
+class Drone extends Dynamic
 {
     constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player())
     {
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
-        this.name = "MAURICE PRIME"
-        this.hp = this.maxHp = 15;
+        this.name = "DRONE PRIME"
+        this.hp = this.maxHp = 32;
         this.player = player;
+        this.range = 
+        {
+            x1:256, x2:res.w-256,
+            y1:(this.t.y-256 < 256 ? 256 : this.t.y-256), y2: (this.t.y-256 < 256 ? 256 : this.t.y-256)+512
+        };
 
-        this.bulletCooldownTime = this.bulletCooldown = 4;
-        this.bulletDuration = 32;
+        this.bulletDuration = 16;
         this.bulletDurationTime = 0;
         this.cooldown = 32;
         this.cooling = 0;
-        this.chargeTime = this.charge = 16;
-        this.charging = false;
+        
         this.bullets = [];
         this.target = {x:0,y:0};
         this.enraged = false;
         this.dying = false;
-        this.grounded = false;
-        this.firstSlam = false;
-        this.gravityMultiplier = 0.01;
+        this.dead = false;
 
-        this.attackPhase = 0;
+        this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+
+        // Set new destination
+        let _x = 0;
+            
+        // Avoid Drone from trying to go into the same corner
+        do {
+            _x = this.center.x+(Math.random()-0.5)*512;
+            _x = (_x > this.range.x2 ? this.range.x2 : (_x < this.range.x1 ? this.range.x1 : _x));
+        }
+        while (_x == this.range.x1 || _x == this.range.x2);
+
+        let _y = 0;
+        
+        // Avoid Drone from trying to go into the same corner
+        do {
+            _y = this.center.y+(Math.random()-0.5)*512;
+            _y = (_y > this.range.y2 ? this.range.y2 : (_y < this.range.y1 ? this.range.y1 : _y));
+        }
+        while (_y == this.range.y1 || _y == this.range.y2)
+        
+        this.destination = {x:_x, y:_y};
     }
 
     dmg(dmg, {x,y}, explosion = false)
@@ -36,41 +58,45 @@ class Maurice extends Dynamic
             BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12));
     }
 
-    collideBottomA({y,h,o})
+    collideAllA({y,h,o})
     {
-        this.v.y = 0;
-        this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
-        this.grounded = true;
-        if (!this.firstSlam)
+        if (!this.dead)
         {
-            display.stacks += 12;
-            shakeReset = 64;
-            this.firstSlam = true;
+            this.v.y = 0;
+        
+            explosions.push(new Explosion(this.t, BIGEXPLOSIONIMG, 0.6, 12, {w:192,h:192}, _NOCOLLISION, true));
+            this.dead = true;
         }
+        
     }
 
     update()
     {
         this.setOldTransform();
+
         for (const bullet of this.bullets)
         {
             bullet.update();
         }
+
+        this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+
         if (this.dying)
         {
-            this.gravityMultiplier *= 1.5;
-            if (!this.grounded)
-                this.v.y += _GRAVITY*this.gravityMultiplier;
-            this.t.y -= this.v.y;
-            this.t.x += this.v.x;
-            this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+            this.moveBy(this.direction, 16);
+            this.r+=25;
             return;
         }
+
+        this.moveTowards(this.destination, 0.1);
+
         if (this.hp <= 0)
         {
             this.dmg(75,{x:0,y:0});
             display.stacks += 12;
             shakeReset = 64;
+
+            this.setDirectionTo({x:this.player.center.x, y:this.player.center.y});
             this.dying = true;
         }
         if (this.hp <= this.maxHp/2 && !this.enraged)
@@ -82,31 +108,44 @@ class Maurice extends Dynamic
             this.charge=0;
             this.enraged = true;
         }
+
         if (PLAYER.dying)
             return;
 
         if (this.cooling >= this.cooldown)
         {
-            if (this.charging)
-            {
-                if (this.charge < this.chargeTime)
-                {
-                    if (this.charge == Math.floor(this.chargeTime/2.5))
-                        this.target = {x:this.player.center.x, y:this.player.center.y};
-                    this.charge++;
-                }
-                else
-                {
-                    this.bullets.push(new Bullet(this.t, BulletPIMG, _NOCOLLISION, this.target, this, true));
-                    FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
-                    this.cooling = 0;
-                }
-                return;
-            }
-
             if (this.bulletDurationTime >= this.bulletDuration)
             {
                 this.bulletDurationTime = 0;
+                let tempArr = [];
+
+                tempArr.push(new Bullet(this.t, _BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
+
+                const x = this.player.center.x - this.center.x;
+                const y = this.player.center.y - this.center.y;
+                let angle = Math.atan(y/x);
+                if (x < 0) angle+=Math.PI;
+
+                angle *= -1;
+                angle -= Math.PI/16;
+
+                tempArr.push(new Bullet(this.t, _BulletIMG, _NOCOLLISION,
+                {
+                    x: Math.cos(angle)+ this.center.x,
+                    y:-Math.sin(angle)+ this.center.y
+                }, this));
+
+                angle += Math.PI/8;
+
+                tempArr.push(new Bullet(this.t, _BulletIMG, _NOCOLLISION,
+                {
+                    x: Math.cos(angle)+ this.center.x,
+                    y:-Math.sin(angle)+ this.center.y
+                }, this));
+
+                this.bullets.push(...tempArr);
+
+                FOREGROUNDQUEUE.push(...tempArr);
                 this.cooling = 0;
             }
             else
@@ -114,31 +153,32 @@ class Maurice extends Dynamic
                 this.bulletDurationTime++;
             }
             
-            if (this.bulletCooldown >= this.bulletCooldownTime)
-            {
-                this.bulletCooldown = 0;
-                this.bullets.push(new Bullet(this.t, BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
-                FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
-            }
-            else
-            {
-                this.bulletCooldown++;
-            }
+            return;
         }
-        else
+        if (this.cooling == 0)
         {
-            this.cooling++;
-            this.attackPhase = ((this.attackPhase) % 3) + 1;
-            if (this.attackPhase == 3)
-            {
-                this.charging = true;
-                this.charge = 0;
+            // Set new destination
+            let x = 0;
+            
+            // Avoid Drone from trying to go into the same corner
+            do {
+                x = this.center.x+(Math.random()-0.5)*512;
+                x = (x > this.range.x2 ? this.range.x2 : (x < this.range.x1 ? this.range.x1 : x));
             }
-            else
-            {
-                this.charging = false;
+            while (x == this.range.x1 || x == this.range.x2);
+
+            let y = 0;
+            
+            // Avoid Drone from trying to go into the same corner
+            do {
+                y = this.center.y+(Math.random()-0.5)*512;
+                y = (y > this.range.y2 ? this.range.y2 : (y < this.range.y1 ? this.range.y1 : y));
             }
+            while (y == this.range.y1 || y == this.range.y2)
+            
+            this.destination = {x:x, y:y};
         }
+        this.cooling++;
     }
 
     renderMore()
@@ -147,7 +187,6 @@ class Maurice extends Dynamic
         {
             if (!this.bullets[i].active)
             {
-                FOREGROUNDQUEUE.splice(FOREGROUNDQUEUE.indexOf(this.bullets[i]), 1);
                 this.bullets.splice(i,1);
             }
         }

@@ -55,13 +55,13 @@ class Rect
     checkCollision({l,r,t,b}, e, bypass)
     {
         if ((this.collision.r && !l) || bypass)
-            l = e.collideLeft(this.t);
+            l = e.collideLeft(this.t, this);
         if ((this.collision.l && !r) || bypass)
-            r = e.collideRight(this.t);
+            r = e.collideRight(this.t, this);
         if ((this.collision.b && !t) || bypass)
-            t = e.collideTop(this.t);
+            t = e.collideTop(this.t, this);
         if ((this.collision.t && !b) || bypass)
-            b = e.collideBottom(this.t);
+            b = e.collideBottom(this.t, this);
 
         return {l:l,r:r,t:t,b:b};
     }
@@ -322,7 +322,7 @@ class Dynamic extends Rect
         return false;
     }
 
-    collideTop({x,y,w,h,o})
+    collideTop({x,y,w,h,o}, e)
     {
         const _o = this.t.h * this.t.o.y;
         const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
@@ -335,15 +335,15 @@ class Dynamic extends Rect
             oldy        >= __y+h)
         {
             if (this.collideTopA != undefined)
-                this.collideTopA({x,y,w,h,o});
+                this.collideTopA({x,y,w,h,o}, e);
             if (this.collideAllA != undefined)
-                this.collideAllA({x,y,w,h,o});
+                this.collideAllA({x,y,w,h,o}, e);
             return true;
         }
         
         return false;
     }
-    collideBottom({x,y,w,h,o})
+    collideBottom({x,y,w,h,o}, e)
     {
         const _o = this.t.h * this.t.o.y;
         const _x = this.t.x + this.t.w * this.t.o.x, _y = this.t.y + _o;
@@ -356,9 +356,9 @@ class Dynamic extends Rect
             oldy+this.t.h <= __y)
         {
             if (this.collideBottomA != undefined)
-                this.collideBottomA({x,y,w,h,o});
+                this.collideBottomA({x,y,w,h,o}, e);
             if (this.collideAllA != undefined)
-                this.collideAllA({x,y,w,h,o});
+                this.collideAllA({x,y,w,h,o}, e);
             return true;
         }
         
@@ -366,7 +366,7 @@ class Dynamic extends Rect
             this.grounded = false;
         return false;
     }
-    collideLeft({x,y,w,h,o})
+    collideLeft({x,y,w,h,o}, e)
     {
         const _o = this.t.w * this.t.o.x;
         const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
@@ -379,15 +379,15 @@ class Dynamic extends Rect
             _y          <= __y+h)
         {
             if (this.collideLeftA != undefined)
-                this.collideLeftA({x,y,w,h,o});
+                this.collideLeftA({x,y,w,h,o}, e);
             if (this.collideAllA != undefined)
-                this.collideAllA({x,y,w,h,o});
+                this.collideAllA({x,y,w,h,o}, e);
             return true;
         }
         
         return false;
     }
-    collideRight({x,y,w,h,o})
+    collideRight({x,y,w,h,o}, e)
     {
         const _o = this.t.w * this.t.o.x;
         const _x = this.t.x + _o, _y = this.t.y + this.t.h * this.t.o.y;
@@ -400,9 +400,9 @@ class Dynamic extends Rect
             _y            <= __y+h)
         {
             if (this.collideRightA != undefined)
-                this.collideRightA({x,y,w,h,o});
+                this.collideRightA({x,y,w,h,o}, e);
             if (this.collideAllA != undefined)
-                this.collideAllA({x,y,w,h,o});
+                this.collideAllA({x,y,w,h,o}, e);
             return true;
         }
         

@@ -9,6 +9,9 @@ const resize = () =>
 
 let shakeReset = 16;
 let shakeDuration = 16;
+
+let musicReset = 16;
+let musicDuration = 16;
 const update = () =>
 {
     if (display.stacks > 0)
@@ -18,13 +21,28 @@ const update = () =>
         shakeReset = shakeDuration;
         display.stacks = 0;
     }
-
-    for (const bloodGenerator of BLOODGENERATORS)
+    if (musicReset > 0)
+        musicReset--;
+    if (musicReset == 0)
     {
-        if (bloodGenerator.active)
-            bloodGenerator.update();
+        Battle01.volume = 1;
+    }
+
+    for (let i = 0; i < BLOODGENERATORS.length; i++)
+    {
+        if (BLOODGENERATORS[i].active)
+            BLOODGENERATORS[i].update();
         else
-            BLOODGENERATORS.splice(BLOODGENERATORS.indexOf(bloodGenerator), 1);
+            BLOODGENERATORS.splice(i, 1);
+    }
+
+    for (let i = 0; i < currentCtx.boss.length; i++)
+    {
+        if (currentCtx.boss[i].dead)
+        {
+            ALL.splice(ALL.indexOf(currentCtx.boss[i]), 1);
+            currentCtx.boss.splice(i, 1);
+        }
     }
     
     // Background
@@ -88,8 +106,7 @@ const update = () =>
 
                     if (boss.dying && !boss.groundedThisFrame)
                     {
-                        element.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", boss);
-                        if (!boss.grounded && PLAYER.updateCollision({l:true,r:true,t:true,b:false}, "rect/rect", boss, true).b) Mauriced();
+                        element.updateCollision({l:false,r:false,t:false,b:false}, "rect/rect", boss);
                     }
                 }
             }
@@ -108,6 +125,7 @@ const update = () =>
                 element.updateCollision({l:false,r:false,t:false,b:false}, "rect/rect", blood);
         }
     }
+        
 
     for (const boss of currentCtx.boss)
     {
@@ -130,12 +148,12 @@ const update = () =>
             boss.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
     }
 
-    for (const blood of BLOOD)
+    for (let i = 0; i < BLOOD.length; i++)
     {
-        if (blood.active)
-            blood.update();
+        if (BLOOD[i].active)
+            BLOOD[i].update();
         else
-            BLOOD.splice(BLOOD.indexOf(blood), 1);
+            BLOOD.splice(i, 1);
     }
 
     PLAYER.lateUpdate();

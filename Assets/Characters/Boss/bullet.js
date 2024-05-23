@@ -1,9 +1,3 @@
-const BulletIMG = new Image();
-BulletIMG.src = "Assets/Textures/bullet.png";
-
-const dedBulletIMG = new Image();
-dedBulletIMG.src = "Assets/Textures/dedBullet.png";
-
 class Bullet extends Dynamic
 {
     constructor({x,y,w,h,o}, c, collision = _BLOCKALL, target, boss, SP = false)
@@ -56,15 +50,23 @@ class Bullet extends Dynamic
             this.shaking = true;
             if (!this.SP)
             {
-                if (e.boss) explosions.push(new Explosion(this.t, EXPLOSIONIMG));
-                else if (display.stacks < 4) display.stacks++;
-                
+                if (e.boss)
+                {
+                    explosions.push(new Explosion(this.t, EXPLOSIONIMG));
+                    InstanceAudio(_EXPLOSIONSFX).play();
+                }
+                else if (display.stacks < 4)
+                {
+                    display.stacks++;
+                }
+
                 if (e.player) e.dmg(1, {x:_x,y:_y});
             }
             else
             {
                 display.stacks += 16;
                 explosions.push(new Explosion(this.t, BIGEXPLOSIONIMG, 0.6, 12, {w:192,h:192}, _NOCOLLISION, true));
+                InstanceAudio(_EXPLOSIONSFX,1).play();;
 
                 for (const bullet of this.player.bullets)
                 {
@@ -81,6 +83,7 @@ class Bullet extends Dynamic
     explode()
     {
         explosions.push(new Explosion(this.t, EXPLOSIONIMG));
+        InstanceAudio(_EXPLOSIONSFX).play();
         this.hit = true;
         this.dying = true;
     }
@@ -100,6 +103,8 @@ class Bullet extends Dynamic
                 this.dying = true;
 
                 explosions.push(new Explosion(this.t, EXPLOSIONIMG));
+                InstanceAudio(_EXPLOSIONSFX).play();
+
                 e.hit = true;
                 e.dying = true;
                 return;
@@ -114,7 +119,7 @@ class Bullet extends Dynamic
                 this.hijacked = true;
                 this.trapped = true;
                 this.radius = radius;
-                this.c = BulletPIMG;
+                this.c = _BulletPIMG;
 
 
                 this.boss.bullets.splice(this.boss.bullets.indexOf(this),1);
@@ -135,7 +140,7 @@ class Bullet extends Dynamic
         {
             this.speed-=4;
         }
-        if (this.deathCountDown == 0)
+        if (this.deathCountDown <= 0)
         {
             this.active = false;
             display.camShake = 0;
@@ -145,7 +150,7 @@ class Bullet extends Dynamic
         
         if (this.dying && this.deathCountDown > 0)
         {
-            if (this.deathCountDown == this.initDC) {this.c = dedBulletIMG; this.r = Math.random()*360}
+            if (this.deathCountDown == this.initDC) {this.c = _dedBulletIMG; this.r = Math.random()*360}
             this.t.w*=1.1;
             this.t.h*=1.1;
             this.alpha*=0.75
@@ -178,5 +183,10 @@ class Bullet extends Dynamic
             y: this.t.y + (Math.random()-0.5)*this.jitteriness,
             w:this.t.w,h:this.t.h,o:this.t.o
         }, this.c, this.alpha, this.r);
+
+        if (!this.active)
+        {
+            FOREGROUNDQUEUE.splice(FOREGROUNDQUEUE.indexOf(this), 1);
+        }
     }
 }

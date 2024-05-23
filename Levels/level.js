@@ -2,16 +2,13 @@
 
 const bossRoom = document.createElement("canvas").getContext("2d");
 
-const bg = new Image();
-bg.src = "Assets/Textures/bg1080p.jpg";
-
 bossRoom.background =
 [
     new Box({x:0,y:0,w:res.w,h:res.h,o:_NOOFFSET}, "lightgray", _NOCOLLISION),
     new Box({x:_VCENTER.x, y:res.h, w:res.w, h:128, o:{x:-0.5,y:-1}}, "black"),
     // new Box({x:_VCENTER.x, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, "green", _PLATFORM),
     // new Box({x:_VCENTER.x, y:512, w:128, h:32, o:{x:-0.5,y:-0.5}}, "green", _PLATFORM),
-    new Box({x:_VCENTER.x+512, y:res.h-128, w:96, h:128, o:{x:-0.5,y:-1}}, "Red")
+    new Box({x:_VCENTER.x+512, y:res.h-128, w:512, h:128, o:{x:-1,y:-1}}, "Red")
 ];
 bossRoom.boss =
 [
