@@ -13,4 +13,5 @@ function InstanceAudio(audioSrc, volume = 0.2)
 
 window.addEventListener("click", () => Battle01.play());
 window.addEventListener("keydown", () => Battle01.play());
+Battle01.addEventListener("ended", (e) => Battle01.play());
 Battle01.volume = 0.5;

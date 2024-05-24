@@ -2,7 +2,7 @@ let id = 0;
 
 class Rect
 {
-    constructor(type = "none", {x,y,w,h,o}, c, collision = _BLOCKALL, initFrame = 0)
+    constructor(type = "none", {x,y,w,h,o}, c, collision = _BLOCKALL, initFrame = 0, delay = 1, loop = true)
     {
         this.type = type;
         this.name = "nameless";
@@ -35,8 +35,10 @@ class Rect
             }
             this.frame = initFrame;
         }
-        this.delay = 1;
+        this.delay = delay;
         this.delayC = 0;
+
+        this.loop = loop;
     }
 
     updateFrameSet(frames)
@@ -141,7 +143,10 @@ class Rect
                 this.delayC++;
                 if (this.delayC == this.delay*engine.fps/30)
                 {
-                    this.frame = (this.frame+1)%this.frameSet.length;
+                    if (this.loop)
+                        this.frame = (this.frame+1)%this.frameSet.length;
+                    else if (this.frame != this.frameSet.length-1)
+                        this.frame++;
                     this.delayC = 0;
                 }
                 break;
