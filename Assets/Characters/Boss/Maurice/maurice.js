@@ -6,7 +6,7 @@ class Maurice extends Dynamic
 
         this.boss = true;
         this.name = "MAURICE PRIME"
-        this.hp = 15
+        this.hp = 75;
         this.maxHp = 75;
         this.player = player;
 
@@ -106,8 +106,8 @@ class Maurice extends Dynamic
         if (this.hp <= this.maxHp/2 && !this.enraged)
         {
             this.bulletCooldownTime/=2;
-            this.cooling = 0;
             this.cooldown/=2;
+            this.cooling = this.cooldown;
             this.chargeTime/=2;
             
             for (const element of this.chargeAni)
