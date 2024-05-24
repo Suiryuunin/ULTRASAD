@@ -12,3 +12,6 @@ _swordIMG.src = "Assets/Characters/Player/sword.png";
 
 const _SwordAuraImg = new Image();
 _SwordAuraImg.src = "Assets/Characters/Player/swordAura.png";
+
+const _Flare = new Image();
+_Flare.src = "Assets/Textures/flare.png";

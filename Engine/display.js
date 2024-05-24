@@ -17,7 +17,7 @@ class Display
         this.shakeStr = 8;
         this.stacks = 0;
         this.camShake = 0;
-        this.downscale = 3;
+        this.downscale = 1;
     }
 
     drawBackground(ctx, color = "black")

@@ -18,7 +18,7 @@ class Maurice extends Dynamic
 
         this.chargeTime = this.charge = 16;
         this.charging = false;
-        const cP = "Assets/Characters/Boss/Maurice/Textures/charge/frame000";
+        const cP = "Assets/Textures/charge/frame000";
         const frames = [];
         for (let i = 0; i < 7; i++)
         {
@@ -28,10 +28,15 @@ class Maurice extends Dynamic
         [
             new Rect("ani", this.t, frames, _NOCOLLISION, 0, Math.round(this.chargeTime/7), false),
             new Rect("ani", this.t, frames, _NOCOLLISION, 0, Math.round(this.chargeTime/7), false),
-            new Rect("ani", this.t, frames, _NOCOLLISION,0,  Math.round(this.chargeTime/7), false)
+            new Rect("ani", this.t, frames, _NOCOLLISION, 0, Math.round(this.chargeTime/7), false)
         ];
         this.chargingAni = false;
         this.ding = false;
+
+        this.flare = new Img(this.t, _Flare, _NOCOLLISION);
+        this.flare.t.w = this.flare.ot.w = 256;
+        this.flareActive = false;
+        this.flareCount = 0;
 
         this.chargeAni[0].alpha = 1;
         this.chargeAni[1].alpha = 0.5;
@@ -102,6 +107,7 @@ class Maurice extends Dynamic
             display.stacks += 12;
             shakeReset = 64;
             this.dying = true;
+            engine.stopQueued = 500;
         }
         if (this.hp <= this.maxHp/2 && !this.enraged)
         {
@@ -134,7 +140,12 @@ class Maurice extends Dynamic
 
                     if (this.charge > Math.floor(this.chargeTime/2.5)) this.chargingAni = false;
                     
-                    
+                    if (this.flareActive && this.flareCount == 0)
+                        this.flareActive = false;
+
+                    if (this.flareActive && this.flareCount > 0)
+                        this.flareCount--;
+
                     if (!this.ding) for (const element of this.chargeAni)
                     {
                         element.t.w -= (this.cooldown+this.chargeTime)/(element.frameSet.length*element.delay)*(element.ot.w*1.5);
@@ -142,12 +153,24 @@ class Maurice extends Dynamic
                         if (element.t.w < 0)
                         {
                             element.t.w = 256;
-                            this.ding = true;
+
+                            if (!this.ding)
+                            {
+                                this.flareActive = true;
+                                this.flareCount+=2;
+                                this.ding = true;
+                            }
                         }
                         if (element.t.h < 0)
                         {
                             element.t.h = 256;
-                            this.ding = true;
+
+                            if (!this.ding)
+                            {
+                                this.flareActive = true;
+                                this.flareCount+=2;
+                                this.ding = true;
+                            }
                         }
                     }
 
@@ -227,6 +250,15 @@ class Maurice extends Dynamic
             {
                 this.bullets.splice(i,1);
             }
+        }
+
+        if (this.flareActive)
+        {
+            this.flare.render();
+            this.flare.r+=90;
+            this.flare.render();
+
+            this.flare.r = 0;
         }
 
         if (this.chargingAni)
