@@ -7,11 +7,15 @@ const resize = () =>
 
 };
 
+let _TRANSITIONING = false;
+let transitionSteps = 4;
+let transitionStep = transitionSteps;
+let transitionMovement = 0;
+let transitionDirection = 1;
+
 let shakeReset = 16;
 let shakeDuration = 16;
 
-let musicReset = 16;
-let musicDuration = 16;
 const update = () =>
 {
     if (display.stacks > 0)
@@ -20,6 +24,19 @@ const update = () =>
     {
         shakeReset = shakeDuration;
         display.stacks = 0;
+    }
+
+    if (_TRANSITIONING)
+    {
+        if (transitionStep > 0)
+        {
+            transitionMovement += (res.w/display.downscale)/transitionSteps*transitionDirection;
+            transitionStep--;
+            return;
+        }
+        transitionStep = transitionSteps;
+        transitionMovement = 0;
+        _TRANSITIONING = false;
     }
 
     for (let i = 0; i < BLOODGENERATORS.length; i++)
@@ -115,7 +132,7 @@ const update = () =>
                 PLAYER.sword.hitbox.hitList = [...new Set(PLAYER.sword.hitbox.hitList)];
             }
 
-            for (const blood of BLOOD)
+            for (const blood of currentCtx.BLOOD)
                 element.updateCollision({l:false,r:false,t:false,b:false}, "rect/rect", blood);
         }
     }
@@ -142,12 +159,12 @@ const update = () =>
             boss.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
     }
 
-    for (let i = 0; i < BLOOD.length; i++)
+    for (let i = 0; i < currentCtx.BLOOD.length; i++)
     {
-        if (BLOOD[i].active)
-            BLOOD[i].update();
+        if (currentCtx.BLOOD[i].active)
+            currentCtx.BLOOD[i].update();
         else
-            BLOOD.splice(i, 1);
+            currentCtx.BLOOD.splice(i, 1);
     }
 
     PLAYER.lateUpdate();
@@ -156,11 +173,32 @@ const update = () =>
     {
         element.update();
     }
+
+
+    if (PLAYER.center.x <= 0)
+    {
+        PLAYER.t.x = res.w-1;
+        switchLevel(-1);
+    }
+    if (PLAYER.center.x >= res.w)
+    {
+        PLAYER.t.x = 1;
+        switchLevel(1);
+    }
 };
 const render = () =>
 {
     // Background
-    display.drawBackground(currentCtx);
+    display.drawBackground(currentCtx, "darkred");
+
+    for (const element of currentCtx.boss)
+    {
+        if (element.visible && element.dying)
+        {
+            element.render();
+        }
+    }
+    
     for (const element of currentCtx.background)
     {
         if (element.visible)
@@ -171,7 +209,7 @@ const render = () =>
 
     for (const element of currentCtx.boss)
     {
-        if (element.visible)
+        if (element.visible && !element.dying)
         {
             element.render();
         }
@@ -189,12 +227,12 @@ const render = () =>
         }
     }
 
-    for (const blood of BLOOD)
+    for (const blood of currentCtx.BLOOD)
     {
         blood.render();
     }
 
-    for (const element of FOREGROUNDQUEUE)
+    for (const element of currentCtx.FOREGROUNDQUEUE)
     {
         element.render();
     }
@@ -212,10 +250,10 @@ const render = () =>
     display.render();
 };
 
-const engine = new Engine(30, update, render);
+const _ENGINE = new Engine(30, update, render);
 const display = new Display(canvas);
 
-engine.start();
+_ENGINE.start();
 
 addEventListener("resize", resize);
 

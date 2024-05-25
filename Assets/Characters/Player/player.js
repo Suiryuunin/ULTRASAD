@@ -352,7 +352,7 @@ class Player extends Physics
             return;
 
         this.ro.y = (Math.sin(this.sinRo)-0.5)*8;
-        this.sinRo+=Math.PI/engine.fps;
+        this.sinRo+=Math.PI/_ENGINE.fps;
 
         for (let i = 0; i < this.bullets.length; i++)
         {

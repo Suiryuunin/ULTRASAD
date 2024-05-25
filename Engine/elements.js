@@ -141,7 +141,7 @@ class Rect
                 }
                 display.drawImg(currentCtx, transform, this.frameSet[this.frame], this.alpha, this.r, this.flip.x, this.flip.y);
                 this.delayC++;
-                if (this.delayC == this.delay*engine.fps/30)
+                if (this.delayC == this.delay*_ENGINE.fps/30)
                 {
                     if (this.loop)
                         this.frame = (this.frame+1)%this.frameSet.length;

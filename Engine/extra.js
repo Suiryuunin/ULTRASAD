@@ -82,7 +82,7 @@ class Blood extends Physics
         this.h *= 0.5;
         this.w *= 0.5;
         this.active = false;
-        display.drawImg(BLOODCTX,
+        display.drawImg(currentCtx.BLOODCTX,
         {
             x:this.t.x,
             y:this.t.y,
@@ -150,7 +150,7 @@ class BloodGenerator
                 else
                     vy = (Math.random()-0.5)*this.speed;
 
-                BLOOD.push(new Blood(this.t, this.size, {vx:vx, vy:vy}));
+                currentCtx.BLOOD.push(new Blood(this.t, this.size, {vx:vx, vy:vy}));
             }
             return;
         }

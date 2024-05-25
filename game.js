@@ -25,28 +25,23 @@ function toCanvasCoords(pageX, pageY)
     return {x, y};
 }
 
+let levels = [];
+let lIndex = 0;
+
 let currentCtx = document.createElement("canvas").getContext("2d");
-currentCtx.background = [];
-currentCtx.boss = [];
-currentCtx.foreground = [];
+let prevCtx = document.createElement("canvas").getContext("2d");
+
 let ALL = [];
 let UI = [];
 const UICTX = document.createElement("canvas").getContext("2d");
 UICTX.canvas.width = res.w;
 UICTX.canvas.height = res.h;
 
-let FOREGROUNDQUEUE = [];
-let BLOOD = [];
-const BLOODCTX = document.createElement("canvas").getContext("2d");
-BLOODCTX.canvas.width = res.w;
-BLOODCTX.canvas.height = res.h;
+
 let BLOODGENERATORS = [];
 const DARKCTX = document.createElement("canvas").getContext("2d");
 DARKCTX.canvas.width = res.w;
 DARKCTX.canvas.height = res.h;
-
-const playerIMG = new Image(64, 128);
-playerIMG.src = "Assets/Textures/bg720p.jpg";
 
 const _sP = "Assets/Characters/Player/Soul/soul000";
 const pFrames = [];
@@ -57,5 +52,43 @@ for (let i = 0; i < 3; i++)
 
 let PLAYER = new Player("ani", {x:_VCENTER.x,y:_VCENTER.y,w:64,h:128,o:_CENTEROFFSET},pFrames);
 PLAYER.name = "player";
+
+function switchLevel(level = 1)
+{
+    lIndex += level;
+    
+    if (lIndex < 0)
+    {
+        lIndex = 0;
+        return;
+    }
+    else if (lIndex >= levels.length)
+    {
+        lIndex = levels.length-1;
+        return;
+    }
+
+    transitionDirection = level;
+
+    _TRANSITIONING = true;
+
+    prevCtx = currentCtx;
+    currentCtx = levels[lIndex];
+
+    ALL = [];
+    ALL.push(...currentCtx.background, ...currentCtx.boss, ...currentCtx.foreground);
+
+    UI =
+    [
+        new HealthBar({x:64, y:res.h-64, w:512, h:64, o:{x:0, y:-0.5}}, PLAYER, "red", "#ff9438", "black", "V1'S SOUL")
+    ];
+
+    let count = 0;
+    for (const boss of currentCtx.boss)
+    {
+        UI.push(new HealthBar({x:256, y:64+count*48, w:res.w-512, h:64, o:{x:0, y:-0.5}}, boss, "red", "#ff9438", "black", boss.name));
+        count++;
+    }
+}
 
 document.addEventListener('contextmenu', event => event.preventDefault());

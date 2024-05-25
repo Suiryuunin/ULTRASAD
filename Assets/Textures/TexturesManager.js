@@ -15,3 +15,22 @@ _SwordAuraImg.src = "Assets/Characters/Player/swordAura.png";
 
 const _Flare = new Image();
 _Flare.src = "Assets/Textures/flare.png";
+
+const _MauriceIMG = 
+{
+    maurice: new Image(),
+    mauriceE: new Image()
+}
+_MauriceIMG["maurice"].src = "Assets/Characters/Boss/Maurice/Textures/Maurice.png";
+_MauriceIMG["mauriceE"].src = "Assets/Characters/Boss/Maurice/Textures/MauriceE.png";
+
+const _DroneIMG = 
+{
+    drone: new Image(),
+    droneE: new Image()
+}
+_DroneIMG["drone"].src = "Assets/Characters/Boss/Drone/Textures/Drone.png";
+_DroneIMG["droneE"].src = "Assets/Characters/Boss/Drone/Textures/DroneE.png";
+
+const _ENRAGEDAURA = new Image();
+_ENRAGEDAURA.src = "Assets/Textures/EnragedAura.png";

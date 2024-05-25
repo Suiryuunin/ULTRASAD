@@ -121,7 +121,6 @@ class Bullet extends Dynamic
                 this.radius = radius;
                 this.c = _BulletPIMG;
 
-
                 this.boss.bullets.splice(this.boss.bullets.indexOf(this),1);
                 this.player.bullets.push(this);
             }
@@ -186,7 +185,7 @@ class Bullet extends Dynamic
 
         if (!this.active)
         {
-            FOREGROUNDQUEUE.splice(FOREGROUNDQUEUE.indexOf(this), 1);
+            currentCtx.FOREGROUNDQUEUE.splice(currentCtx.FOREGROUNDQUEUE.indexOf(this), 1);
         }
     }
 }

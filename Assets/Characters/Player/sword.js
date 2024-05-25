@@ -144,7 +144,8 @@ class Sword extends Dynamic
             {
                 const dmg = this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16;
                 element.dmg(dmg, {x:0,y:0});
-                engine.stopQueued = dmg/15*500;
+                _ENGINE.stopQueued = dmg/15*500;
+                swordin = true;
                 this.sword.player.hp += (this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16)/15*(this.sword.player.maxHp-this.sword.player.hp - this.sword.player.hardDmg);
             }
 
@@ -461,8 +462,8 @@ class Sword extends Dynamic
     {
         this.ro.y = (Math.sin(this.sinRo)-0.5)*4;
         this.roS.y = (Math.sin(this.sinRoS)-0.5)*4;
-        this.sinRo+=Math.PI/engine.fps;
-        this.sinRoS+=Math.PI/engine.fps;
+        this.sinRo+=Math.PI/_ENGINE.fps;
+        this.sinRoS+=Math.PI/_ENGINE.fps;
 
         // Hand Shield
         const transformS = 
@@ -487,7 +488,7 @@ class Sword extends Dynamic
         display.drawImg(currentCtx, transform, this.player.frameSet[this.frame], this.player.alpha, this.player.r, this.player.flip.x, this.player.flip.y);
 
         this.delayC++;
-        if (this.delayC == this.delay*engine.fps/30)
+        if (this.delayC == this.delay*_ENGINE.fps/30)
         {
             this.frame = (this.frame+1)%this.player.frameSet.length;
             this.delayC = 0;

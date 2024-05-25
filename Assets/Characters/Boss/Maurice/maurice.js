@@ -1,13 +1,13 @@
 class Maurice extends Dynamic
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player())
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 75, maxHp = 75)
     {
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
         this.name = "MAURICE PRIME"
-        this.hp = 75;
-        this.maxHp = 75;
+        this.hp = hp;
+        this.maxHp = maxHp;
         this.player = player;
 
         this.bulletCooldownTime = this.bulletCooldown = 4;
@@ -16,7 +16,8 @@ class Maurice extends Dynamic
         this.cooldown = 32;
         this.cooling = 0;
 
-        this.chargeTime = this.charge = 16;
+        this.chargeTime = 16;
+        this.charge = 0;
         this.charging = false;
         const cP = "Assets/Textures/charge/frame000";
         const frames = [];
@@ -45,8 +46,9 @@ class Maurice extends Dynamic
         this.chargeAni[2].r = 20;
 
         this.bullets = [];
+        this.origin = {x,y,w,h,o};
         this.target = {x:0,y:0};
-        this.enraged = false;
+        this.enraged = "";
         this.dying = false;
         this.dead = false;
 
@@ -71,7 +73,7 @@ class Maurice extends Dynamic
     collideBottomA({y,h,o}, e)
     {
         this.v.y = 0;
-        this.t.y = (y+h*o.y)+this.t.h*this.t.o.y;
+        this.t.y = (y+h*o.y)-this.t.h;
         this.grounded = true;
         this.groundedThisFrame = true;
         if (!this.firstSlam)
@@ -80,6 +82,43 @@ class Maurice extends Dynamic
             shakeReset = 64;
             this.firstSlam = true;
         }
+    }
+
+    rotate()
+    {
+        if (this.player.center.x < this.center.x)
+        {
+            this.c = _MauriceIMG["maurice"+this.enraged];
+
+            let x = this.center.x - this.player.center.x;
+            let y = this.center.y - this.player.center.y;
+            const d = Math.sqrt(x**2+y**2);
+
+            x/=d; y/=d;
+            let angle = Math.atan(y/x);
+            this.r = angle/Math.PI*180;
+
+            this.origin.x = this.center.x-x*48+(-y*36);
+            this.origin.y = this.center.y-y*48+(x*36);
+            
+            this.flip.x = -1;
+            return;
+        }
+
+        this.c = _MauriceIMG["maurice"+this.enraged];
+
+        let x = this.center.x - this.player.center.x;
+        let y = this.center.y - this.player.center.y;
+        const d = Math.sqrt(x**2+y**2);
+
+        x/=d; y/=d;
+        let angle = Math.atan(y/x);
+        this.r = angle/Math.PI*180;
+
+        this.origin.x = this.center.x-x*48+(y*36);
+        this.origin.y = this.center.y-y*48+(-x*36);
+        
+        this.flip.x = 1;
     }
 
     update()
@@ -101,15 +140,24 @@ class Maurice extends Dynamic
             this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
             return;
         }
+
+        if (this.charge <= Math.floor(this.chargeTime/2.5))
+            this.rotate();
+
         if (this.hp <= 0)
         {
             this.dmg(75,{x:0,y:0});
             display.stacks += 12;
             shakeReset = 64;
+            this.t.h /= 2;
+            this.t.o.y = 0;
             this.dying = true;
-            engine.stopQueued = 500;
+            this.chargingAni = false;
+            this.flareActive = false;
+            this.setOldTransform();
+            _ENGINE.stopQueued = 500;
         }
-        if (this.hp <= this.maxHp/2 && !this.enraged)
+        if (this.hp <= this.maxHp/2 && this.enraged == "")
         {
             this.bulletCooldownTime/=2;
             this.cooldown/=2;
@@ -123,7 +171,7 @@ class Maurice extends Dynamic
             }
 
             this.charge=0;
-            this.enraged = true;
+            this.enraged = "E";
         }
         if (PLAYER.dying)
             return;
@@ -135,7 +183,7 @@ class Maurice extends Dynamic
             {
                 if (this.charge < this.chargeTime)
                 {
-                    if (this.charge == Math.floor(this.chargeTime/2.5))
+                if (this.charge == Math.floor(this.chargeTime/2.5))
                         this.target = {x:this.player.center.x, y:this.player.center.y};
 
                     if (this.charge > Math.floor(this.chargeTime/2.5)) this.chargingAni = false;
@@ -148,6 +196,8 @@ class Maurice extends Dynamic
 
                     if (!this.ding) for (const element of this.chargeAni)
                     {
+                        element.t.x = this.origin.x;
+                        element.t.y = this.origin.y;
                         element.t.w -= (this.cooldown+this.chargeTime)/(element.frameSet.length*element.delay)*(element.ot.w*1.5);
                         element.t.h -= (this.cooldown+this.chargeTime)/(element.frameSet.length*element.delay)*(element.ot.w*1.5);
                         if (element.t.w < 0)
@@ -158,6 +208,8 @@ class Maurice extends Dynamic
                             {
                                 this.flareActive = true;
                                 this.flareCount+=2;
+                                this.flare.t.x = this.origin.x;
+                                this.flare.t.y = this.origin.y;
                                 this.ding = true;
                             }
                         }
@@ -169,6 +221,8 @@ class Maurice extends Dynamic
                             {
                                 this.flareActive = true;
                                 this.flareCount+=2;
+                                this.flare.t.x = this.origin.x;
+                                this.flare.t.y = this.origin.y;
                                 this.ding = true;
                             }
                         }
@@ -178,8 +232,8 @@ class Maurice extends Dynamic
                 }
                 else
                 {
-                    this.bullets.push(new Bullet(this.t, _BulletPIMG, _NOCOLLISION, this.target, this, true));
-                    FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
+                    this.bullets.push(new Bullet(this.origin, _BulletPIMG, _NOCOLLISION, this.target, this, true));
+                    currentCtx.FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
                     this.cooling = 0;
                 }
                 return;
@@ -198,8 +252,8 @@ class Maurice extends Dynamic
             if (this.bulletCooldown >= this.bulletCooldownTime)
             {
                 this.bulletCooldown = 0;
-                this.bullets.push(new Bullet(this.t, _BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
-                FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
+                this.bullets.push(new Bullet(this.origin, _BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
+                currentCtx.FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
             }
             else
             {
@@ -210,12 +264,15 @@ class Maurice extends Dynamic
         {
             this.cooling++;
 
+            if (this.charge > 0)
+                this.charge = 0;
+
             if (this.charging)
             {
                 for (const element of this.chargeAni)
                 {
-                    (this.cooldown+this.chargeTime)/(element.frameSet.length*element.delay)*(element.ot.w*1.5);
-                    (this.cooldown+this.chargeTime)/(element.frameSet.length*element.delay)*(element.ot.w*1.5);
+                    element.t.x = this.origin.x;
+                    element.t.y = this.origin.y;
                 }
             }
             if (this.cooling > 1)
@@ -230,6 +287,8 @@ class Maurice extends Dynamic
                 {
                     element.t.w = element.ot.w*1.5;
                     element.t.h = element.ot.h*1.5;
+                    element.t.x = this.origin.x;
+                    element.t.y = this.origin.y;
                     element.frame = 0;
                 }
                 this.ding = false;
@@ -240,6 +299,30 @@ class Maurice extends Dynamic
                 this.charging = false;
             }
         }
+    }
+
+    render()
+    {
+        if (this.enraged == "E")
+            display.drawImg(currentCtx,
+            {
+                x:this.t.x + (Math.random()-0.5)*8,
+                y:this.t.y + (Math.random()-0.5)*8,
+                w:this.t.w+32,
+                h:this.t.h+32,
+                o:this.t.o
+            }, _ENRAGEDAURA);
+        
+        display.drawImg(currentCtx,
+        {
+            x:this.t.x + (this.enraged == "E" ? (Math.random()-0.5)*8 : 0),
+            y:this.t.y + (this.enraged == "E" ? (Math.random()-0.5)*8 : 0),
+            w:this.t.w,
+            h:this.dying? this.ot.h:this.t.h,
+            o:this.t.o
+        }, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
+
+        this.renderMore();
     }
 
     renderMore()

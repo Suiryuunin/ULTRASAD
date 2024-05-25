@@ -1,12 +1,13 @@
 class Drone extends Dynamic
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player())
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 32, maxHp = 32)
     {
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
         this.name = "DRONE PRIME"
-        this.hp = this.maxHp = 32;
+        this.hp = hp;
+        this.maxHp = maxHp;
         this.player = player;
         this.range = 
         {
@@ -20,8 +21,9 @@ class Drone extends Dynamic
         this.cooling = 0;
         
         this.bullets = [];
+        this.origin = {x,y,w,h,o};
         this.target = {x:0,y:0};
-        this.enraged = false;
+        this.enraged = "";
         this.dying = false;
         this.dead = false;
 
@@ -70,6 +72,41 @@ class Drone extends Dynamic
         
     }
 
+    rotate()
+    {
+        if (this.player.center.x < this.center.x)
+        {
+            this.c = _DroneIMG["drone"+this.enraged];
+            this.origin.x = this.center.x-36;
+            this.origin.y = this.center.y+42;
+
+            let x = this.center.x - this.player.center.x;
+            let y = this.center.y - this.player.center.y;
+            const d = Math.sqrt(x**2+y**2);
+
+            x/=d; y/=d;
+            let angle = Math.atan(y/x);
+            this.r = angle/Math.PI*180;
+
+            this.flip.x = 1;
+            return;
+        }
+
+        this.c = _DroneIMG["drone"+this.enraged];
+        this.origin.x = this.center.x+36;
+        this.origin.y = this.center.y+42;
+
+        let x = this.center.x - this.player.center.x;
+        let y = this.center.y - this.player.center.y;
+        const d = Math.sqrt(x**2+y**2);
+
+        x/=d; y/=d;
+        let angle = Math.atan(y/x);
+        this.r = angle/Math.PI*180;
+        
+        this.flip.x = -1;
+    }
+
     update()
     {
         this.setOldTransform();
@@ -88,6 +125,7 @@ class Drone extends Dynamic
             return;
         }
 
+        this.rotate();
         this.moveTowards(this.destination, 0.1);
 
         if (this.hp <= 0)
@@ -99,14 +137,14 @@ class Drone extends Dynamic
             this.setDirectionTo({x:this.player.center.x, y:this.player.center.y});
             this.dying = true;
         }
-        if (this.hp <= this.maxHp/2 && !this.enraged)
+        if (this.hp <= this.maxHp/2 && this.enraged == "")
         {
             this.bulletCooldownTime/=2;
             this.cooling = 0;
             this.cooldown/=2;
             this.chargeTime/=2;
             this.charge=0;
-            this.enraged = true;
+            this.enraged = "E";
         }
 
         if (PLAYER.dying)
@@ -145,7 +183,7 @@ class Drone extends Dynamic
 
                 this.bullets.push(...tempArr);
 
-                FOREGROUNDQUEUE.push(...tempArr);
+                currentCtx.FOREGROUNDQUEUE.push(...tempArr);
                 this.cooling = 0;
             }
             else
@@ -181,9 +219,32 @@ class Drone extends Dynamic
         this.cooling++;
     }
 
-    renderMore()
+    render()
     {
-        for (let i = 0; i < this.bullets.length; i++)
+        if (this.enraged == "E")
+            display.drawImg(currentCtx,
+            {
+                x:this.t.x + (Math.random()-0.5)*8,
+                y:this.t.y + (Math.random()-0.5)*8,
+                w:this.t.w+32,
+                h:this.t.h+32,
+                o:this.t.o
+            }, _ENRAGEDAURA, 0.5);
+
+        display.drawImg(currentCtx,
+            {
+                x:this.t.x + (this.enraged == "E" ? (Math.random()-0.5)*8 : 0),
+                y:this.t.y + (this.enraged == "E" ? (Math.random()-0.5)*8 : 0),
+                w:this.t.w,
+                h:this.t.h,
+                o:this.t.o
+            }, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
+    
+        this.renderMore();
+    }
+
+    renderMore()
+    {for (let i = 0; i < this.bullets.length; i++)
         {
             if (!this.bullets[i].active)
             {

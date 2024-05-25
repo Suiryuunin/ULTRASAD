@@ -17,7 +17,7 @@ class Display
         this.shakeStr = 8;
         this.stacks = 0;
         this.camShake = 0;
-        this.downscale = 1;
+        this.downscale = 4;
     }
 
     drawBackground(ctx, color = "black")
@@ -80,15 +80,26 @@ class Display
         
         ctx.save();
 
-        if (r != 0)
+        if ((sx != 1 || sy != 1) && r != 0)
         {
             ctx.translate(x, y);
             ctx.rotate(r * Math.PI / 180);
-        }
-        if (sx != 1 || sy != 1)
-        {
-            ctx.translate(x, y);
             ctx.scale(sx,sy);
+            
+        }
+        else
+        {
+            if (sx != 1 || sy != 1)
+            {
+                ctx.translate(x, y);
+                ctx.scale(sx,sy);
+            }
+
+            if (r != 0)
+            {
+                ctx.translate(x, y);
+                ctx.rotate(r * Math.PI / 180);
+            }
         }
 
         ctx.drawImage(img, w * o.x, h * o.y, w, h);
@@ -156,15 +167,30 @@ class Display
         if (Math.abs(shakePos.y) > 8/this.downscale*2)
             shakePos.y = Math.sign(shakePos.y)*8/this.downscale**2;
 
+        if (_TRANSITIONING)
+        {
+            this.display.drawImage(prevCtx.canvas,
+               transitionMovement,0,
+                prevCtx.canvas.width, prevCtx.canvas.height,
+                shakePos.x, shakePos.y,
+                this.display.canvas.width, this.display.canvas.height);
+            
+            this.display.drawImage(prevCtx.BLOODCTX.canvas,
+               transitionMovement,0,
+                prevCtx.BLOODCTX.canvas.width, prevCtx.BLOODCTX.canvas.height,
+                shakePos.x, shakePos.y,
+                this.display.canvas.width, this.display.canvas.height);    
+        }
+        
         this.display.drawImage(currentCtx.canvas,
-            0, 0,
+            !_TRANSITIONING? 0 : transitionMovement + (transitionDirection < 0 ? res.w : -res.w), 0,
             currentCtx.canvas.width, currentCtx.canvas.height,
             shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);
         
-        this.display.drawImage(BLOODCTX.canvas,
-            0, 0,
-            BLOODCTX.canvas.width, BLOODCTX.canvas.height,
+        this.display.drawImage(currentCtx.BLOODCTX.canvas,
+            !_TRANSITIONING? 0 : transitionMovement + (transitionDirection < 0 ? res.w : -res.w), 0,
+            currentCtx.BLOODCTX.canvas.width, currentCtx.BLOODCTX.canvas.height,
             shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);
 

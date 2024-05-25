@@ -1,3 +1,5 @@
+let swordin = false;
+
 function drawSword(dmg)
 {
     display.drawImg(currentCtx,
@@ -24,6 +26,31 @@ function drawSword(dmg)
     shakeReset = Math.round(32 * (dmg/500));
 }
 
+function checkQueuedStop(engine)
+{
+    if (engine.stopQueued != 0)
+    {
+        if (swordin)
+        {
+            drawSword(engine.stopQueued);
+            swordin = false;
+        }
+        else
+        {
+            display.stacks+=12;
+            shakeReset = 32;
+        }
+        engine.stop();
+        setTimeout(() => {
+            engine.start();
+        }, engine.stopQueued);
+        
+        engine.stopQueued = 0;
+        return true;
+    }
+    return false;
+}
+
 class Engine
 {
     constructor (fps, update, render)
@@ -47,17 +74,7 @@ class Engine
             if (this.deltaR >= Math.floor(1000 / this.fps))
             {
                 this.update();
-                if (this.stopQueued != 0)
-                {
-                    drawSword(this.stopQueued);
-                    this.stop();
-                    setTimeout(() => {
-                        this.start();
-                    }, this.stopQueued);
-                    
-                    this.stopQueued = 0;
-                    return;
-                }
+                if (checkQueuedStop(_ENGINE)) return;
                 this.render();
 
                 this.timeStampR = this.timeStamp = time;
@@ -65,17 +82,7 @@ class Engine
             else if (this.delta >= Math.floor(1000 / 60))
             {
                 this.update();
-                if (this.stopQueued != 0)
-                {
-                    drawSword(this.stopQueued);
-                    this.stop();
-                    setTimeout(() => {
-                        this.start();
-                    }, this.stopQueued);
-
-                    this.stopQueued = 0;
-                    return;
-                }
+                if (checkQueuedStop(_ENGINE)) return;
 
                 this.timeStamp = time;
             }
