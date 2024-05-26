@@ -16,6 +16,8 @@ class Explosion extends Dynamic
         shakeReset = shakeDuration;
         display.stacks += 2;
         this.shaking = true;
+        
+        InstanceAudio(_EXPLOSIONSFX,this.SP ? 0.7 : 0.2).play();;
     }
 
     updateMore()

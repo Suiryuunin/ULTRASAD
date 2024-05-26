@@ -53,7 +53,6 @@ class Bullet extends Dynamic
                 if (e.boss)
                 {
                     explosions.push(new Explosion(this.t, EXPLOSIONIMG));
-                    InstanceAudio(_EXPLOSIONSFX).play();
                 }
                 else if (display.stacks < 4)
                 {
@@ -66,7 +65,6 @@ class Bullet extends Dynamic
             {
                 display.stacks += 16;
                 explosions.push(new Explosion(this.t, BIGEXPLOSIONIMG, 0.6, 12, {w:192,h:192}, _NOCOLLISION, true));
-                InstanceAudio(_EXPLOSIONSFX,0.7).play();;
 
                 for (const bullet of this.player.bullets)
                 {
@@ -83,7 +81,6 @@ class Bullet extends Dynamic
     explode()
     {
         explosions.push(new Explosion(this.t, EXPLOSIONIMG));
-        InstanceAudio(_EXPLOSIONSFX).play();
         this.hit = true;
         this.dying = true;
     }
@@ -103,7 +100,6 @@ class Bullet extends Dynamic
                 this.dying = true;
 
                 explosions.push(new Explosion(this.t, EXPLOSIONIMG));
-                InstanceAudio(_EXPLOSIONSFX).play();
 
                 e.hit = true;
                 e.dying = true;
