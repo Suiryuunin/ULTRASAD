@@ -11,11 +11,11 @@ levels[0].background =
 [
     new Box({x:_VCENTER.x, y:res.h, w:res.w, h:128, o:{x:-0.5,y:-1}}, "maroon"),
     new SwordProp({x:_VCENTER.x, y:_VCENTER.y+208, w:16, h:128, o:{x:-0.5,y:-1}}),
-    new Img({x:_VCENTER.x, y:_VCENTER.y+284, w:64, h:128, o:{x:-0.5,y:-1}}, _PEDESTALIMG, _BLOCKALL),
-    new Img({x:_VCENTER.x, y:res.h-256, w:64, h:128, o:{x:-0.5,y:0}}, _PEDESTALIMG, _BLOCKALL),
     new Img({x:_VCENTER.x-128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORML),
     new Img({x:_VCENTER.x, y:_VCENTER.y+252, w:128, h:24, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORM),
     new Img({x:_VCENTER.x+128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORMR),
+    new Img({x:_VCENTER.x, y:_VCENTER.y+284, w:64, h:128, o:{x:-0.5,y:-1}}, _PEDESTALIMG, _BLOCKALL),
+    new Img({x:_VCENTER.x, y:res.h-256, w:64, h:128, o:{x:-0.5,y:0}}, _PEDESTALIMG, _BLOCKALL, -1),
     new Word({x:256, y:res.h-256, h:32, o:{x:-0.5,y:-0.5}}, ["MOVE WITH A & D"], "white"),
     new Word({x:608, y:res.h-512, h:32, o:{x:-0.5,y:-0.5}}, ["JUMP WITH K","YOU CAN DOUBLE JUMP"], "white"),
     new Word({x:res.w-608, y:res.h-504, h:32, o:{x:-0.5,y:-0.5}}, ["DASH WITH LSHIFT"], "white"),

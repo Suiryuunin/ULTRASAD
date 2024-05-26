@@ -35,6 +35,7 @@ class Player extends Physics
             h: this.radius*2,
             o: {x:-0.5,y:-0.5}
         }, frames, _NOCOLLISION);
+        this.shieldAni.alpha = 0.5;
         
         // Movements
         this.direction = 0;

@@ -252,6 +252,8 @@ class Sword extends Dynamic
             this.lastStabCharge = this.stabCharge;
             this.chargeConcentration = Math.floor(this.stabCharge/(this.maxStabCharge/this.chargeAni.length));
             if (this.chargeConcentration < 1) this.chargeConcentration = 1;
+
+            this.player.shieldAni.alpha = 0.5+this.stabCharge/this.maxStabCharge*0.5;
         }
 
         this.r = -this.player.frozenDirection * 80;
