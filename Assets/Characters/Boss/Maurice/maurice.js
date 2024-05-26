@@ -1,11 +1,12 @@
 class Maurice extends Dynamic
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 75, maxHp = 75)
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 75, maxHp = 75, name = "MAURICE PRIME", broken = false)
     {
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
-        this.name = "MAURICE PRIME"
+        this.name = name;
+        this.broken = broken;
         this.hp = hp;
         this.maxHp = maxHp;
         this.player = player;
@@ -151,12 +152,16 @@ class Maurice extends Dynamic
             shakeReset = 64;
             this.t.h /= 2;
             this.t.o.y = 0;
+            this.r = 0;
             this.dying = true;
             this.chargingAni = false;
             this.flareActive = false;
             this.setOldTransform();
             _ENGINE.stopQueued = 500;
         }
+
+        if (this.broken) return;
+
         if (this.hp <= this.maxHp/2 && this.enraged == "")
         {
             this.bulletCooldownTime/=2;

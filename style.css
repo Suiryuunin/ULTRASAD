@@ -4,16 +4,16 @@
     margin: 0;
 }
 
+@font-face {
+    font-family: VCR_OSD;
+    font-weight: bold;
+    src: url(Assets/VCR_OSD.ttf);
+}
+
 canvas {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%)scale(200%);
     image-rendering: pixelated;
-}
-
-@font-face {
-    font-family: VCR_OSD;
-    font-weight: bold;
-    src: url(Assets/VCR_OSD.ttf);
 }

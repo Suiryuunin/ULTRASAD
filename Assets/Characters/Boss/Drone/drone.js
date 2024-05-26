@@ -1,14 +1,16 @@
 class Drone extends Dynamic
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 32, maxHp = 32)
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 32, maxHp = 32, name = "DRONE PRIME", broken = false)
     {
         super("img", {x,y,w,h,o}, c, collision);
 
         this.boss = true;
-        this.name = "DRONE PRIME"
+        this.name = name;
+        this.broken = broken;
         this.hp = hp;
         this.maxHp = maxHp;
         this.player = player;
+        this.collideWPlayer = true;
         this.range = 
         {
             x1:256, x2:res.w-256,
@@ -29,6 +31,11 @@ class Drone extends Dynamic
 
         this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
 
+        if (this.broken)
+        {
+            this.destination = {x:this.center.x,y:this.center.y};
+            return;
+        }
         // Set new destination
         let _x = 0;
             
@@ -60,7 +67,7 @@ class Drone extends Dynamic
             BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12));
     }
 
-    collideAllA({y,h,o})
+    collideAllA()
     {
         if (!this.dead)
         {
@@ -122,6 +129,7 @@ class Drone extends Dynamic
         {
             this.moveBy(this.direction, 16);
             this.r+=25;
+            if (this.isCollidingWith(this.player.t)) this.collideAllA();
             return;
         }
 
@@ -137,6 +145,9 @@ class Drone extends Dynamic
             this.setDirectionTo({x:this.player.center.x, y:this.player.center.y});
             this.dying = true;
         }
+
+        if (this.broken) return;
+
         if (this.hp <= this.maxHp/2 && this.enraged == "")
         {
             this.bulletCooldownTime/=2;

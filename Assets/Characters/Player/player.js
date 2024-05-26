@@ -8,7 +8,7 @@ class Player extends Physics
         this.hp = this.maxHp = 12;
         this.hardDmg = 0;
         this.lastHit = 0;
-        this.sword = new Sword(this, _swordIMG);
+        this.sword = {};
         this.dying = false;
 
         this.sinRo = 0;
@@ -258,6 +258,32 @@ class Player extends Physics
         
         this.updateMiscPhysics();
     }
+
+    collideAllA({}, e)
+    {
+        if (e.PICKMEUP)
+        {
+            Battle01.currentTime = 0.3;
+            Battle01.play();
+
+            display.color = "darkred";
+
+            this.sword = new Sword(this, _swordIMG);
+            e.PICKMEUP = false;
+
+            levels[0].background.splice(levels[0].background.indexOf(e), 1);
+            ALL.splice(ALL.indexOf(e), 1)
+
+            levels[0].BACKGROUND.clearRect(0,0,res.w,res.h);
+            for (const element of levels[0].background)
+            {
+                if (element.visible)
+                {
+                    element.render(levels[0].BACKGROUND);
+                }
+            }
+        }
+    }
     
     collideTopA({y,h,o})
     {
@@ -329,7 +355,7 @@ class Player extends Physics
             if (this.alpha < 0.1) this.alpha = 0;
             return;
         }
-        this.sword.update();
+        if (this.sword.update != undefined) this.sword.update();
 
         this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
     }
@@ -362,7 +388,8 @@ class Player extends Physics
             }
         }
 
-        this.sword.render();
+        if (this.sword.render != undefined) this.sword.render();
+
         if (this.shield)
             this.shieldAni.render();
     }

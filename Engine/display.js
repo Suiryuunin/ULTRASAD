@@ -17,10 +17,10 @@ class Display
         this.shakeStr = 8;
         this.stacks = 0;
         this.camShake = 0;
-        this.downscale = 4;
+        this.downscale = 1;
     }
 
-    drawBackground(ctx, color = "black")
+    drawBackground(ctx, color = this.color)
     {
         ctx.fillStyle = color;
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);

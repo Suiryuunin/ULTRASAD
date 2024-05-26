@@ -126,7 +126,7 @@ const update = () =>
                 if (!bullet.trapped)
                     element.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", bullet);
 
-            if (PLAYER.sword.hitbox.active && PLAYER.sword.hitbox.isCollidingWith(element.t) && element.collision != _NOCOLLISION)
+            if (PLAYER.sword.hitbox != undefined && PLAYER.sword.hitbox.active && PLAYER.sword.hitbox.isCollidingWith(element.t) && element.collision != _NOCOLLISION)
             {
                 PLAYER.sword.hitbox.hitList.push(element);
                 PLAYER.sword.hitbox.hitList = [...new Set(PLAYER.sword.hitbox.hitList)];
@@ -189,7 +189,7 @@ const update = () =>
 const render = () =>
 {
     // Background
-    display.drawBackground(currentCtx, "darkred");
+    display.drawBackground(currentCtx);
 
     for (const element of currentCtx.boss)
     {
@@ -199,13 +199,11 @@ const render = () =>
         }
     }
     
-    for (const element of currentCtx.background)
-    {
-        if (element.visible)
-        {
-            element.render();
-        }
-    }
+    currentCtx.drawImage(currentCtx.BACKGROUND.canvas,
+        0,0,
+        currentCtx.BACKGROUND.canvas.width, currentCtx.BACKGROUND.canvas.height,
+        0, 0,
+        currentCtx.canvas.width, currentCtx.canvas.height);
 
     for (const element of currentCtx.boss)
     {
@@ -219,13 +217,11 @@ const render = () =>
     PLAYER.render();
 
     // Foreground
-    for (const element of currentCtx.foreground)
-    {
-        if (element.visible)
-        {
-            element.render();
-        }
-    }
+    currentCtx.drawImage(currentCtx.FOREGROUND.canvas,
+        0,0,
+        currentCtx.FOREGROUND.canvas.width, currentCtx.FOREGROUND.canvas.height,
+        0,0,
+        currentCtx.canvas.width, currentCtx.canvas.height);
 
     for (const blood of currentCtx.BLOOD)
     {
@@ -251,8 +247,6 @@ const render = () =>
 };
 
 const _ENGINE = new Engine(30, update, render);
-const display = new Display(canvas);
-
 _ENGINE.start();
 
 addEventListener("resize", resize);

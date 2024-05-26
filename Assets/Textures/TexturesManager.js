@@ -34,3 +34,10 @@ _DroneIMG["droneE"].src = "Assets/Characters/Boss/Drone/Textures/DroneE.png";
 
 const _ENRAGEDAURA = new Image();
 _ENRAGEDAURA.src = "Assets/Textures/EnragedAura.png";
+
+const _PLATFORMIMG = new Image();
+_PLATFORMIMG.src = "Assets/Textures/Platform.png";
+const _WALLIMG = new Image();
+_WALLIMG.src = "Assets/Textures/Wall.png";
+const _PEDESTALIMG = new Image();
+_PEDESTALIMG.src = "Assets/Textures/Pedestal.png";

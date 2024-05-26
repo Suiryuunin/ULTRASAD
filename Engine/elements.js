@@ -1,5 +1,40 @@
 let id = 0;
 
+class Word
+{
+    constructor({x,y,h,o}, word = "", c, collision = _NOCOLLISION)
+    {
+        this.word = word;
+        this.id = id;
+        id++;
+        this.t = {x:x,y:y,h:h,o:o};
+        this.ot = {x:x,y:y,h:h,o:o};
+        this.c = c;
+        this.oc = c;
+        
+        this.visible = true;
+        this.active = true;
+        this.collision = collision;
+        
+        this.alpha = 1;
+
+        this.center = {x:this.t.x - this.t.w*this.t.o.x - this.t.w/2, y:this.t.y- this.t.h*this.t.o.y - this.t.h/2};
+    }
+
+    update()
+    {}
+
+    updateCollision({l,r,t,b})
+    {
+        return {l,r,t,b};
+    }
+
+    render(ctx)
+    {
+        display.drawWord(ctx, {word:this.word, x:this.t.x, y: this.t.y, o: this.t.o, border: false, size:this.t.h, color:this.c, alpha: this.alpha,linesMargin:this.t.h});
+    }
+}
+
 class Rect
 {
     constructor(type = "none", {x,y,w,h,o}, c, collision = _BLOCKALL, initFrame = 0, delay = 1, loop = true)
@@ -113,19 +148,19 @@ class Rect
             this.updateMore();
     }
 
-    render()
+    render(ctx = currentCtx)
     {
         switch(this.type)
         {
             case "color":
             {
-                display.drawRect(currentCtx, this.t, this.c);
+                display.drawRect(ctx, this.t, this.c);
                 break;
             }
 
             case "img":
             {
-                display.drawImg(currentCtx, this.t, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
+                display.drawImg(ctx, this.t, this.c, this.alpha, this.r, this.flip.x, this.flip.y);
                 break;
             }
 
@@ -139,7 +174,7 @@ class Rect
                     h:this.t.h,
                     o:this.t.o
                 }
-                display.drawImg(currentCtx, transform, this.frameSet[this.frame], this.alpha, this.r, this.flip.x, this.flip.y);
+                display.drawImg(ctx, transform, this.frameSet[this.frame], this.alpha, this.r, this.flip.x, this.flip.y);
                 this.delayC++;
                 if (this.delayC == this.delay*_ENGINE.fps/30)
                 {
@@ -190,17 +225,19 @@ class Rect
 
 class Box extends Rect
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL)
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, flipX = 1)
     {
         super("color", {x,y,w,h,o}, c, collision);
+        this.flip.x = flipX;
     }
 }
 
 class Img extends Rect
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL)
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, flipX = 1)
     {
         super("img", {x,y,w,h,o}, c, collision);
+        this.flip.x = flipX;
     }
 }
 

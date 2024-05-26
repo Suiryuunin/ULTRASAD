@@ -495,3 +495,12 @@ class Sword extends Dynamic
         }
     }
 }
+
+class SwordProp extends Dynamic
+{
+    constructor({x,y,w,h,o}, c = _swordIMG, collision = _BLOCKALL)
+    {
+        super("img",{x,y,w,h,o}, c, collision)
+        this.PICKMEUP = true;
+    }
+}
