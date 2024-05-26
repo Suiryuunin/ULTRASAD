@@ -8,9 +8,13 @@ levels[1].BACKGROUND.canvas.height = res.h;
 levels[1].background =
 [
     new Box({x:_VCENTER.x, y:res.h, w:res.w, h:128, o:{x:-0.5,y:-1}}, "maroon"),
-    new Img({x:_VCENTER.x-128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORML),
-    new Img({x:_VCENTER.x, y:_VCENTER.y+252, w:128, h:24, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORM),
-    new Img({x:_VCENTER.x+128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORMR, -1),
+    new Img({x:_VCENTER.x-384, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORML),
+    new Img({x:_VCENTER.x-256, y:_VCENTER.y+256-16, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM),
+    new Img({x:_VCENTER.x-128, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORMC),
+    new Img({x:_VCENTER.x,     y:_VCENTER.y+256-16, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM),
+    new Img({x:_VCENTER.x+128, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORMC, -1),
+    new Img({x:_VCENTER.x+256, y:_VCENTER.y+256-16, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM, -1),
+    new Img({x:_VCENTER.x+384, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORMR, -1),
     new Word({x:_VCENTER.x, y:_VCENTER.y, h:32, o:{x:-0.5,y:-0.5}}, ["PRESS WASD BEFORE ATTACKING TO AIM","", "THE LONGER YOU CHARGE, THE MORE YOU HEAL", "IF YOU HIT THE ENEMY THAT IS..."], "white")
 ];
 
@@ -31,7 +35,7 @@ for (let i = 0; i < res.h/ws.h-1;i++)
 
 levels[1].boss =
 [
-    new Maurice({x:_VCENTER.x+0.0000001, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, _MauriceIMG["maurice"], _BLOCKALL, PLAYER, 1, 75, "maurice...", true)
+    new Maurice({x:_VCENTER.x+0.0000001, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, _MauriceIMG["maurice"], _BLOCKALL, PLAYER, 1, 35, "SAD FACE", true)
 ];
 
 levels[1].FOREGROUND = document.createElement("canvas").getContext("2d");

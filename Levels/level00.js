@@ -4,21 +4,26 @@ levels[0] = document.createElement("canvas").getContext("2d");
 levels[0].canvas.width = res["w"];
 levels[0].canvas.height = res["h"];
 
+levels[0].dark = true;
+
 levels[0].BACKGROUND = document.createElement("canvas").getContext("2d");
 levels[0].BACKGROUND.canvas.width = res.w;
 levels[0].BACKGROUND.canvas.height = res.h;
 levels[0].background =
 [
+    new SwordProp({x:_VCENTER.x, y:_VCENTER.y+208+32, w:16, h:128, o:{x:-0.5,y:-1}}),
+    new Img({x:_VCENTER.x-128, y:_VCENTER.y+256-32, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORML),
+    new Img({x:_VCENTER.x, y:_VCENTER.y+256-32, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM),
+    new Img({x:_VCENTER.x+128, y:_VCENTER.y+256-32, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORMR),
+    new Img({x:_VCENTER.x, y:_VCENTER.y+284+32, w:64, h:128, o:{x:-0.5,y:-1}}, _PEDESTALIMG, _BLOCKALL),
+    new Img({x:_VCENTER.x, y:res.h-256+32, w:64, h:128, o:{x:-0.5,y:0}}, _PEDESTALIMG, _BLOCKALL, -1),
     new Box({x:_VCENTER.x, y:res.h, w:res.w, h:128, o:{x:-0.5,y:-1}}, "maroon"),
-    new SwordProp({x:_VCENTER.x, y:_VCENTER.y+208, w:16, h:128, o:{x:-0.5,y:-1}}),
-    new Img({x:_VCENTER.x-128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORML),
-    new Img({x:_VCENTER.x, y:_VCENTER.y+252, w:128, h:24, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORM),
-    new Img({x:_VCENTER.x+128, y:_VCENTER.y+256, w:128, h:32, o:{x:-0.5,y:-0.5}}, _PLATFORMIMG, _PLATFORMR),
-    new Img({x:_VCENTER.x, y:_VCENTER.y+284, w:64, h:128, o:{x:-0.5,y:-1}}, _PEDESTALIMG, _BLOCKALL),
-    new Img({x:_VCENTER.x, y:res.h-256, w:64, h:128, o:{x:-0.5,y:0}}, _PEDESTALIMG, _BLOCKALL, -1),
+    new Word({x:208, y:_VCENTER.y, h:64, o:{x:-0.5,y:-0.5}}, ["MISSION"], "white"),
+    new Word({x:208, y:_VCENTER.y+64, h:48, o:{x:-0.5,y:-0.5}}, ["1-SS"], "white"),
+    new Word({x:208, y:_VCENTER.y+160-32, h:32, o:{x:-0.5,y:-0.5}}, ["RETURN TO HELL", "GET ULTRAKILLIN'"], "white"),
     new Word({x:256, y:res.h-256, h:32, o:{x:-0.5,y:-0.5}}, ["MOVE WITH A & D"], "white"),
-    new Word({x:608, y:res.h-512, h:32, o:{x:-0.5,y:-0.5}}, ["JUMP WITH K","YOU CAN DOUBLE JUMP"], "white"),
-    new Word({x:res.w-608, y:res.h-504, h:32, o:{x:-0.5,y:-0.5}}, ["DASH WITH LSHIFT"], "white"),
+    new Word({x:608, y:res.h-288, h:32, o:{x:-0.5,y:-0.5}}, ["JUMP WITH K","YOU CAN DOUBLE JUMP"], "white"),
+    new Word({x:_VCENTER.x, y:res.h-504, h:32, o:{x:-0.5,y:-0.5}}, ["DASH WITH LSHIFT"], "white"),
     new Word({x:res.w-256, y:res.h-320, h:32, o:{x:-0.5,y:-0.5}}, ["HOLD J TO CHARGE", "RELEASE TO ATTACK"], "white")
 ];
 
@@ -41,7 +46,7 @@ for (let i = 0; i < res.h/ws.h-1;i++)
 
 levels[0].boss =
 [
-    new Drone({x:res.w-48, y:res.h-192, w:96, h:96, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 1, 32, "drone...", true)
+    new Drone({x:res.w-48, y:res.h-192, w:96, h:96, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 0.01, 1, "BROKEN DRONE", true)
 ];
 
 levels[0].FOREGROUND = document.createElement("canvas").getContext("2d");

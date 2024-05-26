@@ -19,6 +19,8 @@ const _VCENTER = {x: Math.floor(res.w/2), y: Math.floor(res.h/2)};
 const _NOOFFSET = {x:0,y:0};
 const _CENTEROFFSET = {x:-0.5,y:-0.5};
 
+const _ULTRASAD = new Img({x:_VCENTER.x, y:_VCENTER.y, w:res.w,h:res.h, o:_CENTEROFFSET}, _ULTRASADIMG, _NOCOLLISION);
+
 const EXPLOSIONIMG = new Image();
 EXPLOSIONIMG.src = "Assets/Textures/explosion.png";
 const BIGEXPLOSIONIMG = new Image();
@@ -55,6 +57,17 @@ let BLOODGENERATORS = [];
 const DARKCTX = document.createElement("canvas").getContext("2d");
 DARKCTX.canvas.width = res.w;
 DARKCTX.canvas.height = res.h;
+
+function addLight(ctx, xStart, yStart, rStart, xEnd, yEnd, rEnd)
+{
+    DARKCTX.globalCompositeOperation = 'xor';
+    const g = ctx.createRadialGradient(xStart, yStart, rStart, xEnd, yEnd, rEnd);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    g.addColorStop(0, `rgba(0,0,0,1)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(xStart - rEnd, yStart - rEnd, xEnd + rEnd, yEnd + rEnd);
+    ctx.fillStyle = `rgba(0,0,0,1)`;
+}
 
 const _sP = "Assets/Characters/Player/Soul/soul000";
 const pFrames = [];

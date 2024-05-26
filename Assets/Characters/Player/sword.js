@@ -143,6 +143,14 @@ class Sword extends Dynamic
             if (element.hp != undefined)
             {
                 const dmg = this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16;
+
+                InstanceAudio(_DINGSFX, this.sword.lastStabCharge/this.sword.maxStabCharge).play();
+                if (dmg == 15)
+                {
+                    InstanceAudio(_DINGSFX, 1).play();
+                    InstanceAudio(_DINGSFX, 1).play();
+                }
+
                 element.dmg(dmg, {x:0,y:0});
                 _ENGINE.stopQueued = dmg/15*500;
                 swordin = true;

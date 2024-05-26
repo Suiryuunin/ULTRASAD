@@ -10,6 +10,10 @@ class Player extends Physics
         this.lastHit = 0;
         this.sword = {};
         this.dying = false;
+        this.ULTRACOUNT = -1;
+        this.ULTRACTX = {};
+
+        this.dmgCD = 0;
 
         this.sinRo = 0;
 
@@ -128,6 +132,12 @@ class Player extends Physics
 
     dmg(dmg, {x,y}, explosion = false)
     {
+        if (this.dmgCD == 0)
+        {
+            InstanceAudio(_THUNKSFX, 1).play();
+            this.dmgCD = 4;
+        }
+
         this.hp -= dmg;
         if (dmg < this.hp)
             this.hardDmg += dmg/2;
@@ -223,6 +233,13 @@ class Player extends Physics
 
     updateMovement()
     {
+        if (this.dmgCD > 0) this.dmgCD--;
+
+        if (this.ULTRACOUNT == 0)
+            this.ULTRACTX.FOREGROUNDQUEUE.splice(this.ULTRACTX.FOREGROUNDQUEUE.indexOf(_ULTRASAD), 1);
+        if (this.ULTRACOUNT > 0)
+            this.ULTRACOUNT--;
+
         if (this.hp <= 0 && !this.dying)
         {
             this.dmg(64, {x:0,y:0},true);
@@ -266,6 +283,11 @@ class Player extends Physics
         {
             Battle01.currentTime = 0.3;
             Battle01.play();
+
+            currentCtx.dark = false;
+            currentCtx.FOREGROUNDQUEUE.push(_ULTRASAD);
+            this.ULTRACOUNT = 256;
+            this.ULTRACTX = currentCtx;
 
             display.color = "darkred";
 

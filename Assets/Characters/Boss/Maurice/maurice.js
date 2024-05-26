@@ -11,6 +11,8 @@ class Maurice extends Dynamic
         this.maxHp = maxHp;
         this.player = player;
 
+        this.dmgCD = 0;
+
         this.bulletCooldownTime = this.bulletCooldown = 4;
         this.bulletDuration = 32;
         this.bulletDurationTime = 0;
@@ -64,6 +66,11 @@ class Maurice extends Dynamic
 
     dmg(dmg, {x,y}, explosion = false)
     {
+        if (this.dmgCD == 0)
+        {
+            InstanceAudio(_THUNKSFX, 1).play();
+            this.dmgCD = 4;
+        }
         this.hp -= dmg;
         if (explosion)
             BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12, true));
@@ -125,6 +132,10 @@ class Maurice extends Dynamic
     update()
     {
         this.setOldTransform();
+
+        if (this.dmgCD > 0)
+            this.dmgCD--;
+
         for (const bullet of this.bullets)
         {
             bullet.update();
@@ -147,17 +158,7 @@ class Maurice extends Dynamic
 
         if (this.hp <= 0)
         {
-            this.dmg(75,{x:0,y:0});
-            display.stacks += 12;
-            shakeReset = 64;
-            this.t.h /= 2;
-            this.t.o.y = 0;
-            this.r = 0;
-            this.dying = true;
-            this.chargingAni = false;
-            this.flareActive = false;
-            this.setOldTransform();
-            _ENGINE.stopQueued = 500;
+            this.die();
         }
 
         if (this.broken) return;
@@ -237,6 +238,7 @@ class Maurice extends Dynamic
                 }
                 else
                 {
+                    InstanceAudio(_PEWSFX).play();
                     this.bullets.push(new Bullet(this.origin, _BulletPIMG, _NOCOLLISION, this.target, this, true));
                     currentCtx.FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
                     this.cooling = 0;
@@ -257,6 +259,7 @@ class Maurice extends Dynamic
             if (this.bulletCooldown >= this.bulletCooldownTime)
             {
                 this.bulletCooldown = 0;
+                InstanceAudio(_PEWSFX).play();
                 this.bullets.push(new Bullet(this.origin, _BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
                 currentCtx.FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
             }
@@ -311,10 +314,10 @@ class Maurice extends Dynamic
         if (this.enraged == "E")
             display.drawImg(currentCtx,
             {
-                x:this.t.x + (Math.random()-0.5)*8,
-                y:this.t.y + (Math.random()-0.5)*8,
+                x:this.center.x + (Math.random()-0.5)*8,
+                y:this.center.y + (Math.random()-0.5)*8,
                 w:this.t.w+32,
-                h:this.t.h+32,
+                h:this.ot.h+32,
                 o:this.t.o
             }, _ENRAGEDAURA);
         
@@ -334,8 +337,9 @@ class Maurice extends Dynamic
     {
         for (let i = 0; i < this.bullets.length; i++)
         {
-            if (!this.bullets[i].active)
+            if (!this.bullets[i].active || this.dying)
             {
+                this.bullets[i].active = false;
                 this.bullets.splice(i,1);
             }
         }
@@ -357,6 +361,28 @@ class Maurice extends Dynamic
                 this.chargeAni[i].render();
             }
         }
+    }
+
+    die()
+    {
+        InstanceAudio(_DEDSFX, 1).play();
+        InstanceAudio(_DEDSFX, 1).play();
+        InstanceAudio(_DEDSFX, 1).play();
+
+        this.dmg(75,{x:0,y:0});
+        display.stacks += 12;
+        shakeReset = 64;
+        this.t.h /= 2;
+        this.t.o.y = 0;
+        this.r = 0;
+        this.dying = true;
+        this.chargingAni = false;
+        this.flareActive = false;
+
+        for (const bullet of this.bullets)
+            bullet.active = false;
+        
+        this.setOldTransform();
     }
 }
 

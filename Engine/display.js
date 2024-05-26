@@ -18,6 +18,25 @@ class Display
         this.stacks = 0;
         this.camShake = 0;
         this.downscale = 1;
+
+        addEventListener("keydown", (e) =>
+        {
+            switch(e.code)
+            {
+                case "BracketLeft":
+                    this.downscale--;
+                    if (this.downscale < 1)
+                        this.downscale = 1;
+                    this.resize(window.innerWidth, window.innerHeight, res.h/res.w);
+                    this.render();
+                    break;
+                case "BracketRight":
+                    this.downscale++;
+                    this.resize(window.innerWidth, window.innerHeight, res.h/res.w);
+                    this.render();
+                    break;
+            }
+        });
     }
 
     drawBackground(ctx, color = this.color)
@@ -71,9 +90,7 @@ class Display
         {
             x += w * o.x;
             y += h * o.y;
-        }
-        if (r == 0 && sx == 1 && sy == 1)
-        {
+            
             ctx.drawImage(img, x, y, w, h);
             return;
         }
@@ -194,10 +211,19 @@ class Display
             shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);
 
-        this.display.drawImage(DARKCTX.canvas,
-            0, 0,
-            DARKCTX.canvas.width, DARKCTX.canvas.height,
-            shakePos.x, shakePos.y,
-            this.display.canvas.width, this.display.canvas.height);
+        if (currentCtx.dark)
+        {
+            DARKCTX.globalCompositeOperation = 'source-over';
+            DARKCTX.fillStyle = `rgba(0,0,0,1)`;
+            DARKCTX.fillRect(0, 0, res.w, res.h);
+            
+            addLight(DARKCTX, PLAYER.center.x,PLAYER.center.y, 0,PLAYER.center.x,PLAYER.center.y, 256);
+
+            this.display.drawImage(DARKCTX.canvas,
+                0, 0,
+                DARKCTX.canvas.width, DARKCTX.canvas.height,
+                shakePos.x, shakePos.y,
+                this.display.canvas.width, this.display.canvas.height);
+        }
     }
 }

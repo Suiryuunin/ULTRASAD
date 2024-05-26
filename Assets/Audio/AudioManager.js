@@ -1,4 +1,8 @@
 const _EXPLOSIONSFX = "Assets/Audio/SFX/boom.wav";
+const _THUNKSFX = "Assets/Audio/SFX/thunk.wav";
+const _PEWSFX = "Assets/Audio/SFX/pew.wav";
+const _DINGSFX = "Assets/Audio/SFX/ding.wav";
+const _DEDSFX = "Assets/Audio/SFX/ded.wav";
 const Battle01 = new Audio("Assets/Audio/Tracks/Battle01.wav");
 document.addEventListener("load", () => Battle01.play());
 

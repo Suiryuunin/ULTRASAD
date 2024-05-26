@@ -11,6 +11,9 @@ class Drone extends Dynamic
         this.maxHp = maxHp;
         this.player = player;
         this.collideWPlayer = true;
+
+        this.dmgCD = 0;
+
         this.range = 
         {
             x1:256, x2:res.w-256,
@@ -60,6 +63,11 @@ class Drone extends Dynamic
 
     dmg(dmg, {x,y}, explosion = false)
     {
+        if (this.dmgCD == 0)
+        {
+            InstanceAudio(_THUNKSFX, 1).play();
+            this.dmgCD = 4;
+        }
         this.hp -= dmg;
         if (explosion)
             BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12, true));
@@ -118,6 +126,9 @@ class Drone extends Dynamic
     {
         this.setOldTransform();
 
+        if (this.dmgCD > 0)
+            this.dmgCD--;
+
         for (const bullet of this.bullets)
         {
             bullet.update();
@@ -138,12 +149,7 @@ class Drone extends Dynamic
 
         if (this.hp <= 0)
         {
-            this.dmg(75,{x:0,y:0});
-            display.stacks += 12;
-            shakeReset = 64;
-
-            this.setDirectionTo({x:this.player.center.x, y:this.player.center.y});
-            this.dying = true;
+            this.die();
         }
 
         if (this.broken) return;
@@ -192,6 +198,7 @@ class Drone extends Dynamic
                     y:-Math.sin(angle)+ this.center.y
                 }, this));
 
+                InstanceAudio(_PEWSFX, 0.5).play();
                 this.bullets.push(...tempArr);
 
                 currentCtx.FOREGROUNDQUEUE.push(...tempArr);
@@ -255,12 +262,31 @@ class Drone extends Dynamic
     }
 
     renderMore()
-    {for (let i = 0; i < this.bullets.length; i++)
+    {
+        for (let i = 0; i < this.bullets.length; i++)
         {
-            if (!this.bullets[i].active)
+            if (!this.bullets[i].active || this.dying)
             {
+                this.bullets[i].active = false;
                 this.bullets.splice(i,1);
             }
         }
+    }
+
+    die()
+    {
+        InstanceAudio(_DEDSFX, 1).play();
+        InstanceAudio(_DEDSFX, 1).play();
+        InstanceAudio(_DEDSFX, 1).play();
+
+        this.dmg(75,{x:0,y:0});
+        display.stacks += 12;
+        shakeReset = 64;
+
+        for (const bullet of this.bullets)
+            bullet.active = false;
+
+        this.setDirectionTo({x:this.player.center.x, y:this.player.center.y});
+        this.dying = true;
     }
 }
