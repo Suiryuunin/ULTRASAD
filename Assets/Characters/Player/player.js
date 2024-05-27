@@ -108,6 +108,7 @@ class Player extends Physics
                 }
                 return;
             }
+            this.frozenDirection = this.axisMapping[code];
             this.direction += this.axisMapping[code];
             this.keys[code] = true;
             
@@ -294,10 +295,10 @@ class Player extends Physics
             this.sword = new Sword(this, _swordIMG);
             e.PICKMEUP = false;
 
-            levels[0].background.splice(levels[0].background.indexOf(e), 1);
+            currentCtx.background.splice(levels[0].background.indexOf(e), 1);
             ALL.splice(ALL.indexOf(e), 1)
 
-            levels[0].BACKGROUND.clearRect(0,0,res.w,res.h);
+            currentCtx.BACKGROUND.clearRect(0,0,res.w,res.h);
             for (const element of levels[0].background)
             {
                 if (element.visible)

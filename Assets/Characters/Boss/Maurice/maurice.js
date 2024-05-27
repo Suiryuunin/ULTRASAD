@@ -1,6 +1,6 @@
 class Maurice extends Dynamic
 {
-    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 75, maxHp = 75, name = "MAURICE PRIME", broken = false)
+    constructor({x,y,w,h,o}, c, collision = _BLOCKALL, player = new Player(), hp = 75, maxHp = 75, name = "MAURICE PRIME", broken = false, rageT)
     {
         super("img", {x,y,w,h,o}, c, collision);
 
@@ -12,6 +12,8 @@ class Maurice extends Dynamic
         this.player = player;
 
         this.dmgCD = 0;
+
+        this.rageT = rageT;
 
         this.bulletCooldownTime = this.bulletCooldown = 4;
         this.bulletDuration = 32;
@@ -145,7 +147,7 @@ class Maurice extends Dynamic
             if (!this.grounded)
             {
                 this.v.y += _GRAVITY*this.gravityMultiplier;
-                if (this.isCollidingWith(this.player.t)) Mauriced();
+                if (this.isCollidingWith(this.player.t)) this.Mauriced();
             }
             this.t.y -= this.v.y;
             this.t.x += this.v.x;
@@ -161,10 +163,11 @@ class Maurice extends Dynamic
             this.die();
         }
 
-        if (this.broken) return;
+        if (this.broken == true) return;
 
-        if (this.hp <= this.maxHp/2 && this.enraged == "")
+        if (this.hp <= (this.rageT != undefined ? this.rageT:this.maxHp/2) && this.enraged == "")
         {
+            this.c = _MauriceIMG["mauriceE"];
             this.bulletCooldownTime/=2;
             this.cooldown/=2;
             this.cooling = this.cooldown;
@@ -238,7 +241,7 @@ class Maurice extends Dynamic
                 }
                 else
                 {
-                    InstanceAudio(_PEWSFX).play();
+                    InstanceAudio(_PEWSFX,0.2).play();
                     this.bullets.push(new Bullet(this.origin, _BulletPIMG, _NOCOLLISION, this.target, this, true));
                     currentCtx.FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
                     this.cooling = 0;
@@ -259,7 +262,7 @@ class Maurice extends Dynamic
             if (this.bulletCooldown >= this.bulletCooldownTime)
             {
                 this.bulletCooldown = 0;
-                InstanceAudio(_PEWSFX).play();
+                InstanceAudio(_PEWSFX,0.2).play();
                 this.bullets.push(new Bullet(this.origin, _BulletIMG, _NOCOLLISION, {x:this.player.center.x, y:this.player.center.y}, this));
                 currentCtx.FOREGROUNDQUEUE.push(this.bullets[this.bullets.length-1]);
             }
@@ -286,7 +289,11 @@ class Maurice extends Dynamic
             if (this.cooling > 1)
                 return;
 
-            this.attackPhase = ((this.attackPhase) % 3) + 1;
+            if (this.broken != "NOCHARGE")
+                this.attackPhase = ((this.attackPhase) % 3) + 1;
+            else
+                this.attackPhase = 1;
+
             if (this.attackPhase == 3)
             {
                 this.charging = true;
@@ -384,11 +391,9 @@ class Maurice extends Dynamic
         
         this.setOldTransform();
     }
-}
-
-// MAURICED
-
-function Mauriced()
-{
-    PLAYER.dmg(75, {x:0,y:0},true);
+    Mauriced()
+    {
+        PLAYER.dmg(75, {x:0,y:0},true);
+        POPUPQUEUE.push(new Popup({x:this.player.center.x, y:this.player.center.y}, ["+MAURICED"], 0.01));
+    }
 }

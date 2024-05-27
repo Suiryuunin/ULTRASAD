@@ -42,5 +42,7 @@ const _PLATFORMIMG = new Image();
 _PLATFORMIMG.src = "Assets/Textures/Platform.png";
 const _WALLIMG = new Image();
 _WALLIMG.src = "Assets/Textures/Wall.png";
+const _DOORIMG = new Image();
+_DOORIMG.src = "Assets/Textures/Door.png";
 const _PEDESTALIMG = new Image();
 _PEDESTALIMG.src = "Assets/Textures/Pedestal.png";

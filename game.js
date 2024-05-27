@@ -13,6 +13,8 @@ const _WALLB = {l:true, r:true, t:false, b:true};
 
 // Wall size
 const ws = {w:64, h:128};
+const fs = {w:128, h:32};
+const fs2 = {w:128, h:24};
 
 const _GRAVITY = -1.2;
 const _VCENTER = {x: Math.floor(res.w/2), y: Math.floor(res.h/2)};
@@ -58,6 +60,8 @@ const DARKCTX = document.createElement("canvas").getContext("2d");
 DARKCTX.canvas.width = res.w;
 DARKCTX.canvas.height = res.h;
 
+let POPUPQUEUE = [];
+
 function addLight(ctx, xStart, yStart, rStart, xEnd, yEnd, rEnd)
 {
     DARKCTX.globalCompositeOperation = 'xor';
@@ -102,7 +106,7 @@ function switchLevel(level = 1)
     currentCtx = levels[lIndex];
 
     ALL = [];
-    ALL.push(...currentCtx.background, ...currentCtx.boss, ...currentCtx.foreground);
+    ALL.push(...currentCtx.background, ...currentCtx.boss, ...currentCtx.foreground, ...currentCtx.doors);
 
     UI =
     [
@@ -115,6 +119,12 @@ function switchLevel(level = 1)
         UI.push(new HealthBar({x:256, y:64+count*48, w:res.w-512, h:64, o:{x:0, y:-0.5}}, boss, "red", "#ff9438", "black", boss.name));
         count++;
     }
+    if (currentCtx.rockPile)
+        for (const rockPile of currentCtx.rockPile)
+        {
+            UI.push(new HealthBar({x:256, y:64+count*48, w:res.w-512, h:64, o:{x:0, y:-0.5}}, rockPile, "red", "#ff9438", "black", rockPile.name));
+            count++;
+        }
 }
 
 document.addEventListener('contextmenu', event => event.preventDefault());

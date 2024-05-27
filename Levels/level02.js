@@ -4,12 +4,21 @@ levels[2] = document.createElement("canvas").getContext("2d");
 levels[2].canvas.width = res["w"];
 levels[2].canvas.height = res["h"];
 
+levels[2].cleared = false;
+levels[2].doors =
+[
+    new Img({x:res.w-64/2, y:res.h-128, w:64, h:256, o:{x:-0.5,y:-1}}, _DOORIMG, _BLOCKALL, 1),
+    new Img({x:0         , y:res.h-128, w:64, h:256, o:{x:0,y:-1}}, _DOORIMG, _BLOCKALL)
+];
+
+for (const door of levels[2].doors)
+    door.active = false;
+
 levels[2].BACKGROUND = document.createElement("canvas").getContext("2d");
 levels[2].BACKGROUND.canvas.width = res.w;
 levels[2].BACKGROUND.canvas.height = res.h;
 levels[2].background =
 [
-    new Box({x:_VCENTER.x, y:res.h, w:res.w, h:128, o:{x:-0.5,y:-1}}, "maroon"),
     new Img({x:_VCENTER.x-128-64, y:_VCENTER.y, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORML),
     new Img({x:_VCENTER.x, y:_VCENTER.y-256+16, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM),
     new Img({x:_VCENTER.x+128+64, y:_VCENTER.y, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORMR),
@@ -35,6 +44,19 @@ for (let i = 0; i < res.h/ws.h-1;i++)
     {
         levels[2].background.push(new Img({x:0, y:ws.h*i, w:ws.w, h:ws.h, o:{x:0,y:0}}, _WALLIMG, _WALLB))
         levels[2].background.push(new Img({x:res.w-ws.w/2, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLB, -1));
+    }
+}
+
+// Floor
+for (let i = 0; i < res.w/fs.h-1;i++)
+{
+    if (i % 2 == 0)
+    {
+        levels[2].background.push(new Img({x:128*i, y:res.h-128, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORMC, Math.round(Math.random())*2-1));
+    }
+    else
+    {
+        levels[2].background.push(new Img({x:128*i, y:res.h-128, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM, Math.round(Math.random())*2-1));
     }
 }
 

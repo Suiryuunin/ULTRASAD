@@ -46,6 +46,28 @@ class Explosion extends Dynamic
     {
         if (e.hp != undefined)
         {
+            if (e.BLOWMEUP)
+            {
+                if (this.SP)
+                    e.dmg(0.15);
+
+                if (e.hp <= 0)
+                {
+                    currentCtx.background.splice(currentCtx.background.indexOf(e), 1);
+                    currentCtx.rockPile.splice(currentCtx.rockPile.indexOf(e), 1);
+                    ALL.splice(ALL.indexOf(e), 1);
+
+                currentCtx.BACKGROUND.clearRect(0,0,res.w,res.h);
+                for (const element of currentCtx.background)
+                    {
+                        if (element.visible)
+                        {
+                            element.render(currentCtx.BACKGROUND);
+                        }
+                    }
+                }
+                return;
+            }
             e.dmg(this.SP ? 0.15 : 0.1, {x:0,y:0}, true);
         }
     }
@@ -157,5 +179,48 @@ class BloodGenerator
             return;
         }
         this.active = false;
+    }
+}
+
+class RockPile extends Dynamic
+{
+    constructor({x,y,w,h,o}, c = _swordIMG, collision = _BLOCKALL)
+    {
+        super("img",{x,y,w,h,o}, c, collision)
+
+        this.name = "ROCKPILE";
+        this.hp = 12;
+        this.maxHp = 12;
+        this.BLOWMEUP = true;
+    }
+
+    dmg(dmg)
+    {
+        InstanceAudio(_EXPLOSIONSFX, 0.1).play();
+
+        this.dmgCD = 4;
+        this.hp -= dmg;
+        BLOODGENERATORS.push(new BloodGenerator({x:this.center.x,y:this.center.y}, dmg*12, 0.7, 10,12, true));
+    }
+}
+
+class Popup extends Word
+{
+    constructor({x,y}, word = "", speed = 0.02, c = "white", collision = _NOCOLLISION)
+    {
+        super({x,y,h:32,o:{x:-0.5,y:-0.5}}, word, c, collision);
+        this.speed = speed;
+    }
+    
+    update()
+    {
+        this.t.y-=4;
+        this.alpha-=this.speed;
+
+        if (this.alpha <= 0)
+        {
+            POPUPQUEUE.splice(POPUPQUEUE.indexOf(this), 1);
+            return;
+        }
     }
 }

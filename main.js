@@ -16,6 +16,8 @@ let transitionDirection = 1;
 let shakeReset = 16;
 let shakeDuration = 16;
 
+let bossCount = 0;
+
 const update = () =>
 {
     if (display.stacks > 0)
@@ -25,6 +27,29 @@ const update = () =>
         shakeReset = shakeDuration;
         display.stacks = 0;
     }
+
+    if (!currentCtx.cleared)
+    {
+        bossCount = 0;
+        for (const boss of currentCtx.boss)
+        {
+            if (!boss.dying)
+                bossCount++;
+        }
+        if (bossCount == 0)
+        {
+            currentCtx.cleared = true;
+            for (const door of currentCtx.doors)
+            {
+                door.active = false;
+                ALL.splice(ALL.indexOf(door), 1);
+            }
+        }
+    }
+
+    if (!currentCtx.cleared && PLAYER.center.x > 128 && PLAYER.center.x < _VCENTER.x)
+        for (const door of currentCtx.doors)
+            door.active = true;
 
     if (_TRANSITIONING)
     {
@@ -90,6 +115,21 @@ const update = () =>
     {
         element.update();
     }
+
+    for (const element of POPUPQUEUE)
+    {
+        element.update();
+    }
+
+
+
+
+
+
+
+
+
+
 
     // Collisions
 
@@ -157,6 +197,12 @@ const update = () =>
         PLAYER.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
         for (const boss of currentCtx.boss)
             boss.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
+
+        if (currentCtx.rockPile)
+            for (const rockPile of currentCtx.rockPile)
+            {
+                rockPile.updateCollision({l:false,r:false,t:false,b:false}, "circle/rect", explosion);
+            }
     }
 
     for (let i = 0; i < currentCtx.BLOOD.length; i++)
@@ -186,6 +232,31 @@ const update = () =>
         switchLevel(1);
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const render = () =>
 {
     // Background
@@ -199,10 +270,18 @@ const render = () =>
         }
     }
     
+    for (const element of currentCtx.doors)
+    {
+        if (element.active)
+        {
+            element.render();
+        }
+    }
+
     currentCtx.drawImage(currentCtx.BACKGROUND.canvas,
         0,0,
         currentCtx.BACKGROUND.canvas.width, currentCtx.BACKGROUND.canvas.height,
-        0, 0,
+        0,0,
         currentCtx.canvas.width, currentCtx.canvas.height);
 
     for (const element of currentCtx.boss)
@@ -234,6 +313,11 @@ const render = () =>
     }
 
     for (const element of explosions)
+    {
+        element.render();
+    }
+
+    for (const element of POPUPQUEUE)
     {
         element.render();
     }

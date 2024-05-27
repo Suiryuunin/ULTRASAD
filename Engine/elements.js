@@ -29,7 +29,7 @@ class Word
         return {l,r,t,b};
     }
 
-    render(ctx)
+    render(ctx = currentCtx)
     {
         display.drawWord(ctx, {word:this.word, x:this.t.x, y: this.t.y, o: this.t.o, border: false, size:this.t.h, color:this.c, alpha: this.alpha,linesMargin:this.t.h});
     }

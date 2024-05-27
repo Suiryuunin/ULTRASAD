@@ -142,19 +142,26 @@ class Sword extends Dynamic
 
             if (element.hp != undefined)
             {
-                const dmg = this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16;
-
-                InstanceAudio(_DINGSFX, this.sword.lastStabCharge/this.sword.maxStabCharge).play();
-                if (dmg == 15)
+                if (!element.BLOWMEUP)
                 {
-                    InstanceAudio(_DINGSFX, 1).play();
-                    InstanceAudio(_DINGSFX, 1).play();
+                    const dmg = this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16;
+    
+                    InstanceAudio(_DINGSFX, this.sword.lastStabCharge/this.sword.maxStabCharge).play();
+                    if (dmg == 15)
+                    {
+                        InstanceAudio(_DINGSFX, 1).play();
+                        InstanceAudio(_DINGSFX, 1).play();
+                    }
+    
+                    element.dmg(dmg, {x:0,y:0});
+                    _ENGINE.stopQueued = dmg/15*500;
+                    swordin = true;
+                    this.sword.player.hp += (this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16)/15*(this.sword.player.maxHp-this.sword.player.hp - this.sword.player.hardDmg);
                 }
-
-                element.dmg(dmg, {x:0,y:0});
-                _ENGINE.stopQueued = dmg/15*500;
-                swordin = true;
-                this.sword.player.hp += (this.sword.lastStabCharge == this.sword.maxStabCharge ? 15 : this.sword.lastStabCharge/16)/15*(this.sword.player.maxHp-this.sword.player.hp - this.sword.player.hardDmg);
+                else
+                {
+                    POPUPQUEUE.push(new Popup({x:this.sword.player.center.x, y:this.sword.player.center.y}, ["NOT ENOUGH FIREPOWER!"]));
+                }
             }
 
             this.hitList = [];
