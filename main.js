@@ -8,8 +8,11 @@ const resize = () =>
 };
 
 let _TRANSITIONING = false;
+let _TRANSITIONINGY = false;
 let transitionSteps = 4;
+let transitionStepsY = 32;
 let transitionStep = transitionSteps;
+let transitionStepY = transitionStepsY;
 let transitionMovement = 0;
 let transitionDirection = 1;
 
@@ -62,6 +65,19 @@ const update = () =>
         transitionStep = transitionSteps;
         transitionMovement = 0;
         _TRANSITIONING = false;
+    }
+
+    if (_TRANSITIONINGY)
+    {
+        if (transitionStepY > 0)
+        {
+            transitionMovement += (res.h/display.downscale)/transitionStepsY*transitionDirection;
+            transitionStepY--;
+            return;
+        }
+        transitionStepY = transitionStepsY;
+        transitionMovement = 0;
+        _TRANSITIONINGY = false;
     }
 
     for (let i = 0; i < BLOODGENERATORS.length; i++)
@@ -231,6 +247,12 @@ const update = () =>
         PLAYER.t.x = 1;
         switchLevel(1);
     }
+
+    if (PLAYER.center.y >= res.h)
+    {
+        PLAYER.t.y = 1;
+        switchLevel(1, true);
+    }
 };
 
 
@@ -335,7 +357,7 @@ const render = () =>
     RESTARTSCOUNT.render();
     RESTARTSCOUNTR.render();
 
-    TIMER.word = ["TIME: "+(_ENGINE.time/60000).toFixed(0).padStart(2, "0")+":"+(_ENGINE.time/1000).toFixed(3).padStart(6,"0")];
+    TIMER.word = ["TIME: "+Math.floor(_ENGINE.time/60000).toFixed(0).padStart(2, "0")+":"+(_ENGINE.time/1000%60).toFixed(3).padStart(6,"0")];
     TIMER.render();
 
     if (PLAYER.deathScreen.alpha > 0)

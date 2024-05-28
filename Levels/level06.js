@@ -18,6 +18,11 @@ levels[6].doors =
     new Img({x:0         , y:res.h-56, w:64, h:256, o:{x:0,y:-1}}, _DOORIMG, _BLOCKALL)
 ];
 
+levels[6].hints =
+[
+    new Word({x:_VCENTER.x, y:_VCENTER.y, h:64, o:{x:-0.5,y:-0.5}}, ["MAKE MAURICE COMMIT SUICIDE"], "green")
+];
+
 for (const door of levels[6].doors)
     door.active = false;
 
@@ -123,6 +128,21 @@ window.addEventListener("load", () => {
 levels[6].reset = () =>
 {
     currentCtx.restarts++;
+    
+    if (currentCtx.restarts == 10)
+    {
+        currentCtx.background.push(...currentCtx.hints);
+
+        currentCtx.BACKGROUND.clearRect(0,0,res.w,res.h);
+        for (const element of currentCtx.background)
+        {
+            if (element.visible)
+            {
+                element.render(currentCtx.BACKGROUND);
+            }
+        }
+    }
+    
     currentCtx.cleared = false;
     currentCtx.boss =
     [

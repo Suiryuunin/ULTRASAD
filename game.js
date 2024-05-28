@@ -91,7 +91,7 @@ for (let i = 0; i < 3; i++)
 let PLAYER = new Player("ani", {x:212,y:0,w:64,h:128,o:_CENTEROFFSET},pFrames);
 PLAYER.name = "player";
 
-function switchLevel(level = 1)
+function switchLevel(level = 1, Y = false)
 {
     lIndex += level;
     
@@ -106,11 +106,12 @@ function switchLevel(level = 1)
         return;
     }
 
-    lIndex = 6;
-
     transitionDirection = level;
 
-    _TRANSITIONING = true;
+    if (Y)
+        _TRANSITIONINGY = true;
+    else
+        _TRANSITIONING = true;
 
     prevCtx = currentCtx;
     currentCtx = levels[lIndex];

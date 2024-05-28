@@ -18,6 +18,11 @@ levels[5].doors =
     new Img({x:0         , y:res.h-56, w:64, h:256, o:{x:0,y:-1}}, _DOORIMG, _BLOCKALL)
 ];
 
+levels[5].hints =
+[
+    new Word({x:_VCENTER.x, y:_VCENTER.y, h:64, o:{x:-0.5,y:-0.5}}, ["MAURICE'S CHARGED BULLET PACKS A PUNCH"], "green")
+];
+
 levels[5].rockPile =
 [
     new RockPile({x:res.w-64, y:res.h-128, w:128, h:128, o:{x:-0.5,y:-1}}, _PLATFORMIMG, _BLOCKALL)
@@ -106,7 +111,10 @@ window.addEventListener("load", () => {
 levels[5].reset = () =>
 {
     currentCtx.restarts++;
+        
+
     currentCtx.cleared = false;
+
     currentCtx.boss =
     [
         new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 35, 35, "MAURICE")
@@ -122,6 +130,11 @@ levels[5].reset = () =>
     }
 
     currentCtx.background.push(...currentCtx.rockPile);
+
+    if (currentCtx.restarts == 10)
+    {
+        currentCtx.background.push(...currentCtx.hints);
+    }
 
     currentCtx.BACKGROUND.clearRect(0,0,res.w,res.h);
     for (const element of currentCtx.background)

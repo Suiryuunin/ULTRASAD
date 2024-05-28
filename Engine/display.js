@@ -200,13 +200,13 @@ class Display
         }
         
         this.display.drawImage(currentCtx.canvas,
-            !_TRANSITIONING? 0 : transitionMovement + (transitionDirection < 0 ? res.w : -res.w), 0,
+            !_TRANSITIONING? 0 : transitionMovement + (transitionDirection < 0 ? res.w : -res.w), !_TRANSITIONINGY? 0 : transitionMovement + (transitionDirection < 0 ? res.h : -res.h),
             currentCtx.canvas.width, currentCtx.canvas.height,
             shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);
         
         this.display.drawImage(currentCtx.BLOODCTX.canvas,
-            !_TRANSITIONING? 0 : transitionMovement + (transitionDirection < 0 ? res.w : -res.w), 0,
+            !_TRANSITIONING? 0 : transitionMovement + (transitionDirection < 0 ? res.w : -res.w), !_TRANSITIONINGY? 0 : transitionMovement + (transitionDirection < 0 ? res.h : -res.h),
             currentCtx.BLOODCTX.canvas.width, currentCtx.BLOODCTX.canvas.height,
             shakePos.x, shakePos.y,
             this.display.canvas.width, this.display.canvas.height);

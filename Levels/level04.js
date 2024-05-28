@@ -20,7 +20,7 @@ levels[4].doors =
 
 levels[4].hints =
 [
-    new Word({x:_VCENTER.x, y:_VCENTER.y, h:64, o:{x:-0.5,y:-0.5}}, ["YOU CAN JUMP LOWER","BY TAPPING K QUICKLY"], "white"),
+    new Word({x:_VCENTER.x, y:_VCENTER.y, h:64, o:{x:-0.5,y:-0.5}}, ["YOU CAN JUMP LOWER","BY TAPPING K QUICKLY"], "green"),
 ];
 
 
@@ -33,6 +33,7 @@ levels[4].BACKGROUND.canvas.height = res.h;
 levels[4].background =
 [
     new Box({x:0,y:res.h-128, w:res.w, h:512, o:{x:0,y:0}}, "rgba(0,0,0,0)", _BLOCKALL),
+    new Word({x:_VCENTER.x, y:_VCENTER.y+256-64, h:32, o:{x:-0.5,y:-0.5}}, ["HINTS WILL APPEAR EVERY 10 RESTARTS PER ROOM", "IF THERE ARE THAT IS..."], "white")
 ];
 
 // Ceiling
@@ -117,6 +118,21 @@ window.addEventListener("load", () => {
 levels[4].reset = () =>
 {
     currentCtx.restarts++;
+
+    if (currentCtx.restarts == 10)
+    {
+        currentCtx.background.push(...currentCtx.hints);
+
+        currentCtx.BACKGROUND.clearRect(0,0,res.w,res.h);
+        for (const element of currentCtx.background)
+        {
+            if (element.visible)
+            {
+                element.render(currentCtx.BACKGROUND);
+            }
+        }
+    }
+
     currentCtx.cleared = false;
     currentCtx.boss =
     [

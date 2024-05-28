@@ -37,7 +37,8 @@ levels[2].background =
 
 
     new Word({x:512+128, y:res.h-512-256, h:32, o:{x:-0.5,y:-0.5}}, ["CHARGING CREATES A FORCE FIELD THAT TRAPS BULLETS","RELEASING WILL SHOOT THEM", "OTHER BULLETS HITTING YOUR BULLETS WILL EXPLODE"], "white"),
-    new Word({x:res.w-(512+128), y:res.h-512, h:32, o:{x:-0.5,y:-0.5}}, ["WHEN ENEMIES' HEALTH IS BELOW 50%", "THEY FALL INTO AN ENRAGED STATE"], "white")
+    new Word({x:res.w-(512+128), y:res.h-512, h:32, o:{x:-0.5,y:-0.5}}, ["WHEN ENEMIES' HEALTH IS BELOW 50%", "THEY FALL INTO AN ENRAGED STATE"], "white"),
+    new Word({x:_VCENTER.x, y:_VCENTER.y+256-32, h:32, o:{x:-0.5,y:-0.5}}, ["PRESS [R] TO RESTART WHENEVER YOU WANT"], "white")
 ];
 
 for (let i = 0; i < res.h/ws.h-1;i++)

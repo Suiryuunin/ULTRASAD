@@ -36,12 +36,12 @@ levels[0].background =
     new Img({x:_VCENTER.x, y:res.h-256+32, w:64, h:128, o:{x:-0.5,y:0}}, _PEDESTALIMG, _BLOCKALL, -1),
     new Word({x:208, y:_VCENTER.y, h:64, o:{x:-0.5,y:-0.5}}, ["MISSION"], "white"),
     new Word({x:208, y:_VCENTER.y+64, h:48, o:{x:-0.5,y:-0.5}}, ["0-SS"], "white"),
-    new Word({x:208, y:_VCENTER.y+160-32, h:32, o:{x:-0.5,y:-0.5}}, ["RETURN TO HELL", "GET ULTRAKILLIN'"], "white"),
-    new Word({x:256, y:res.h-256, h:32, o:{x:-0.5,y:-0.5}}, ["MOVE WITH A & D"], "white"),
-    new Word({x:608, y:res.h-288, h:32, o:{x:-0.5,y:-0.5}}, ["JUMP WITH K","YOU CAN DOUBLE JUMP"], "white"),
-    new Word({x:_VCENTER.x, y:res.h-504, h:32, o:{x:-0.5,y:-0.5}}, ["DASH WITH LSHIFT"], "white"),
-    new Word({x:_VCENTER.x, y:res.h-576-128, h:48, o:{x:-0.5,y:-0.5}}, ["IF FPS IS BELOW 60", "PRESS [ OR ]", "TO DECREMENT/INCREMENT DOWNSCALING"], "white"),
-    new Word({x:res.w-256, y:res.h-320, h:32, o:{x:-0.5,y:-0.5}}, ["HOLD J TO CHARGE", "RELEASE TO STAB"], "white")
+    new Word({x:208, y:_VCENTER.y+160-32, h:32, o:{x:-0.5,y:-0.5}}, ["FIND A WEAPON", "RETURN TO HELL"], "white"),
+    new Word({x:256, y:res.h-256, h:32, o:{x:-0.5,y:-0.5}}, ["MOVE WITH [A] & [D]"], "white"),
+    new Word({x:608-16, y:res.h-288-48, h:32, o:{x:-0.5,y:-0.5}}, ["JUMP WITH [K]","YOU CAN DOUBLE JUMP"], "white"),
+    new Word({x:_VCENTER.x, y:res.h-504, h:32, o:{x:-0.5,y:-0.5}}, ["DASH WITH [LSHIFT]"], "white"),
+    new Word({x:_VCENTER.x, y:res.h-576-128, h:48, o:{x:-0.5,y:-0.5}}, ["IF UPDATE FPS IS BELOW 60", "PRESS [ OR ]", "TO DECREMENT/INCREMENT DOWNSCALING"], "red"),
+    new Word({x:res.w-256, y:res.h-320, h:32, o:{x:-0.5,y:-0.5}}, ["HOLD [J] TO CHARGE", "RELEASE TO STAB"], "white")
 ];
 
 for (let i = 0; i < res.h/ws.h-1;i++)

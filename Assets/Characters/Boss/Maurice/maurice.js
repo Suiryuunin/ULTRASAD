@@ -215,6 +215,8 @@ class Maurice extends Dynamic
 
                             if (!this.ding)
                             {
+                                InstanceAudio(_DINGSFX, 1).play();
+                                InstanceAudio(_DINGSFX, 1).play();
                                 this.flareActive = true;
                                 this.flareCount+=2;
                                 this.flare.t.x = this.origin.x;
@@ -228,6 +230,8 @@ class Maurice extends Dynamic
 
                             if (!this.ding)
                             {
+                                InstanceAudio(_DINGSFX, 1).play();
+                                InstanceAudio(_DINGSFX, 1).play();
                                 this.flareActive = true;
                                 this.flareCount+=2;
                                 this.flare.t.x = this.origin.x;
