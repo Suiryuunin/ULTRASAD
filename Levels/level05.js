@@ -25,7 +25,7 @@ levels[5].hints =
 
 levels[5].rockPile =
 [
-    new RockPile({x:res.w-64, y:res.h-128, w:128, h:128, o:{x:-0.5,y:-1}}, _PLATFORMIMG, _BLOCKALL)
+    new RockPile({x:res.w-64, y:res.h-128, w:128, h:128, o:{x:-0.5,y:-1}}, _ROCKPILEIMG, _BLOCKALL)
 ];
 
 for (const door of levels[5].doors)
@@ -37,6 +37,13 @@ levels[5].BACKGROUND.canvas.height = res.h;
 levels[5].background =
 [
     new Box({x:0,y:res.h-128, w:res.w, h:512, o:{x:0,y:0}}, "rgba(0,0,0,0)", _BLOCKALL),
+    new Img({x:_VCENTER.x-256, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _BLOCKALL),
+    new Img({x:_VCENTER.x+256, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _BLOCKALL, -1),
+    new Img({x:res.w-128, y:_VCENTER.y, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM, -1),
+    new Img({x:128, y:_VCENTER.y, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM),
+
+    new Img({x:_VCENTER.x-578, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _BLOCKALL),
+    new Img({x:_VCENTER.x+578, y:_VCENTER.y+256-16, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _BLOCKALL)
 ];
 
 for (let i = 0; i < res.h/ws.h-1;i++)
@@ -121,17 +128,18 @@ levels[5].reset = () =>
     ];
     currentCtx.rockPile =
     [
-        new RockPile({x:res.w-64, y:res.h-128, w:128, h:128, o:{x:-0.5,y:-1}}, _PLATFORMIMG, _BLOCKALL)
+        new RockPile({x:res.w-64, y:res.h-128, w:128, h:128, o:{x:-0.5,y:-1}}, _ROCKPILEIMG, _BLOCKALL)
     ];
 
-    for (const pile of currentCtx.rockPile)
+    for (const pile of currentCtx.background)
     {
-        currentCtx.background.splice(currentCtx.background.indexOf(pile), 1);
+        if (pile.BLOWMEUP)
+            currentCtx.background.splice(currentCtx.background.indexOf(pile), 1);
     }
 
     currentCtx.background.push(...currentCtx.rockPile);
 
-    if (currentCtx.restarts == 10)
+    if (currentCtx.restarts >= 10)
     {
         currentCtx.background.push(...currentCtx.hints);
     }

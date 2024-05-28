@@ -366,7 +366,7 @@ const render = () =>
     display.render();
 };
 
-const _ENGINE = new Engine(60, update, render);
+const _ENGINE = new Engine(30, update, render);
 _ENGINE.start();
 
 addEventListener("resize", resize);

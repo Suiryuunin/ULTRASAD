@@ -57,8 +57,8 @@ class Explosion extends Dynamic
                     currentCtx.rockPile.splice(currentCtx.rockPile.indexOf(e), 1);
                     ALL.splice(ALL.indexOf(e), 1);
 
-                currentCtx.BACKGROUND.clearRect(0,0,res.w,res.h);
-                for (const element of currentCtx.background)
+                    currentCtx.BACKGROUND.clearRect(0,0,res.w,res.h);
+                    for (const element of currentCtx.background)
                     {
                         if (element.visible)
                         {
@@ -148,7 +148,7 @@ class BloodGenerator
 {
     constructor({x,y},count, size, speed, radius = 16, anywhere = false)
     {
-        this.particlesLeft = count;
+        this.particlesLeft = 0;
         this.active = true;
         this.t = {x:x,y:y,w:32,h:32,o:{x:-0.5,y:-0.5}};
         this.size = size;

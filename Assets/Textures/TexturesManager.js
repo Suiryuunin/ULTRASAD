@@ -48,3 +48,6 @@ const _DOORIMG = new Image();
 _DOORIMG.src = "Assets/Textures/Door.png";
 const _PEDESTALIMG = new Image();
 _PEDESTALIMG.src = "Assets/Textures/Pedestal.png";
+
+const _ROCKPILEIMG = new Image();
+_ROCKPILEIMG.src = "Assets/Textures/RockPile.png";

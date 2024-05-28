@@ -89,7 +89,7 @@ for (let i = 0; i < res.w/fs.h-1;i++)
 
 levels[6].boss =
 [
-    new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 35, 35, "MAURICE")
+    new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 16, 35, "MAURICE")
 ];
 
 levels[6].FOREGROUND = document.createElement("canvas").getContext("2d");
@@ -142,11 +142,11 @@ levels[6].reset = () =>
             }
         }
     }
-    
+
     currentCtx.cleared = false;
     currentCtx.boss =
     [
-        new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 35, 35, "MAURICE")
+        new Maurice({x:_VCENTER.x, y:256, w:128, h:128, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 16, 35, "MAURICE")
     ];
     
     currentCtx.FOREGROUNDQUEUE = [];

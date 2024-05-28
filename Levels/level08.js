@@ -29,6 +29,8 @@ levels[8].BACKGROUND.canvas.height = res.h;
 levels[8].background =
 [
     new Word({x:_VCENTER.x, y:res.h-256, h:48, o:{x:-0.5,y:-0.5}}, ["FINALLY...HELL", "FIRST LAYER: LIMBO"], "red"),
+    new Word({x:64, y:256, h:32, o:{x:0,y:0}}, ["YOU HAVE ESCAPED THE WORLD OF LIVING", 'THIS IS WHERE THE "ESCAPE" ENDS'], "red"),
+    new Word({x:64, y:256+32*3, h:32, o:{x:0,y:0}}, ["CREDITS","","SFX", "YUXIN HUANG", "", "TRACK", "BATTLE 01 - HIRAOKA KOTARO", "", "ANIMATIONS", "YUXIN HUANG", "", "PROGRAMMING", "YUXIN"], "white")
 ];
 
 for (let i = 0; i < res.h/ws.h-1;i++)
@@ -36,14 +38,16 @@ for (let i = 0; i < res.h/ws.h-1;i++)
     levels[8].background.push(new Img({x:0, y:ws.h*i, w:ws.w, h:ws.h, o:{x:0,y:0}}, _WALLIMG, _WALLC));
     // Walls
     if (i < res.h/ws.h-4)
-        {
+    {
+        levels[8].background.push(new Img({x:res.w-ws.w/2, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLC, -1));
         levels[8].background.push(new Img({x:_VCENTER.x-128, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLC))
         levels[8].background.push(new Img({x:_VCENTER.x+128, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLC, -1));
     }
     else if (i == Math.ceil(res.h/ws.h-4))
     {
+        levels[8].background.push(new Img({x:res.w-ws.w/2, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLB, -1));
         levels[8].background.push(new Img({x:_VCENTER.x-128, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLB))
-        levels[8].background.push(new Img({x:_VCENTER.x+128, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLC, -1));
+        levels[8].background.push(new Img({x:_VCENTER.x+128, y:ws.h*i, w:ws.w, h:ws.h, o:{x:-0.5,y:0}}, _WALLIMG, _WALLB, -1));
     }
 }
 
