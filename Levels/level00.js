@@ -3,8 +3,15 @@
 levels[0] = document.createElement("canvas").getContext("2d");
 levels[0].canvas.width = res["w"];
 levels[0].canvas.height = res["h"];
+levels[0].restarts = 0;
 
 levels[0].dark = true;
+
+levels[0].st =
+{
+    x:212,
+    y:0
+};
 
 levels[0].cleared = false;
 levels[0].doors =
@@ -20,6 +27,7 @@ levels[0].BACKGROUND.canvas.width = res.w;
 levels[0].BACKGROUND.canvas.height = res.h;
 levels[0].background =
 [
+    new Box({x:0,y:res.h-128, w:res.w, h:512, o:{x:0,y:0}}, "rgba(0,0,0,0)", _BLOCKALL),
     new SwordProp({x:_VCENTER.x, y:_VCENTER.y+208+32, w:16, h:128, o:{x:-0.5,y:-1}}),
     new Img({x:_VCENTER.x-128, y:_VCENTER.y+256-32, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORML),
     new Img({x:_VCENTER.x, y:_VCENTER.y+256-32, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM),
@@ -27,11 +35,12 @@ levels[0].background =
     new Img({x:_VCENTER.x, y:_VCENTER.y+284+32, w:64, h:128, o:{x:-0.5,y:-1}}, _PEDESTALIMG, _BLOCKALL),
     new Img({x:_VCENTER.x, y:res.h-256+32, w:64, h:128, o:{x:-0.5,y:0}}, _PEDESTALIMG, _BLOCKALL, -1),
     new Word({x:208, y:_VCENTER.y, h:64, o:{x:-0.5,y:-0.5}}, ["MISSION"], "white"),
-    new Word({x:208, y:_VCENTER.y+64, h:48, o:{x:-0.5,y:-0.5}}, ["1-SS"], "white"),
+    new Word({x:208, y:_VCENTER.y+64, h:48, o:{x:-0.5,y:-0.5}}, ["0-SS"], "white"),
     new Word({x:208, y:_VCENTER.y+160-32, h:32, o:{x:-0.5,y:-0.5}}, ["RETURN TO HELL", "GET ULTRAKILLIN'"], "white"),
     new Word({x:256, y:res.h-256, h:32, o:{x:-0.5,y:-0.5}}, ["MOVE WITH A & D"], "white"),
     new Word({x:608, y:res.h-288, h:32, o:{x:-0.5,y:-0.5}}, ["JUMP WITH K","YOU CAN DOUBLE JUMP"], "white"),
     new Word({x:_VCENTER.x, y:res.h-504, h:32, o:{x:-0.5,y:-0.5}}, ["DASH WITH LSHIFT"], "white"),
+    new Word({x:_VCENTER.x, y:res.h-576-128, h:48, o:{x:-0.5,y:-0.5}}, ["IF FPS IS BELOW 60", "PRESS [ OR ]", "TO DECREMENT/INCREMENT DOWNSCALING"], "white"),
     new Word({x:res.w-256, y:res.h-320, h:32, o:{x:-0.5,y:-0.5}}, ["HOLD J TO CHARGE", "RELEASE TO STAB"], "white")
 ];
 
@@ -57,11 +66,11 @@ for (let i = 0; i < res.w/fs.h-1;i++)
 {
     if (i % 2 == 0)
     {
-        levels[0].background.push(new Img({x:128*i, y:res.h-128, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORMC, Math.round(Math.random())*2-1));
+        levels[0].background.push(new Img({x:128*i, y:res.h-128, w:128, h:32, o:{x:-0.5,y:0}}, _PLATFORMIMG, _NOCOLLISION, Math.round(Math.random())*2-1));
     }
     else
     {
-        levels[0].background.push(new Img({x:128*i, y:res.h-128, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _PLATFORM, Math.round(Math.random())*2-1));
+        levels[0].background.push(new Img({x:128*i, y:res.h-128, w:128, h:24, o:{x:-0.5,y:0}}, _PLATFORMIMG, _NOCOLLISION, Math.round(Math.random())*2-1));
     }
 }
 
@@ -120,3 +129,30 @@ window.addEventListener("load", () => {
         }
     }
 });
+
+levels[0].reset = () =>
+{
+    currentCtx.restarts++;
+    currentCtx.cleared = false;
+
+    currentCtx.boss =
+    [
+        new Drone({x:res.w-48, y:res.h-192, w:96, h:96, o:{x:-0.5,y:-0.5}}, _DroneIMG["drone"], _BLOCKALL, PLAYER, 0.01, 1, "BROKEN DRONE", true)
+    ];
+    
+    currentCtx.FOREGROUNDQUEUE = [];
+    ALL = [];
+    ALL.push(...currentCtx.background, ...currentCtx.boss, ...currentCtx.foreground, ...currentCtx.doors);
+
+    UI =
+    [
+        new HealthBar({x:64, y:res.h-64, w:512, h:64, o:{x:0, y:-0.5}}, PLAYER, "red", "#ff9438", "black", "V1'S SOUL")
+    ];
+
+    let count = 0;
+    for (const boss of currentCtx.boss)
+    {
+        UI.push(new HealthBar({x:256, y:64+count*48, w:res.w-512, h:64, o:{x:0, y:-0.5}}, boss, "red", "#ff9438", "black", boss.name));
+        count++;
+    }
+};

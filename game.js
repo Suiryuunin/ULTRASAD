@@ -1,4 +1,5 @@
 const res = {w:1920, h:1080};
+const display = new Display(canvas);
 
 //Collision preset
 const _NOCOLLISION = {l:false, r:false, t:false, b:false};
@@ -29,6 +30,15 @@ const BIGEXPLOSIONIMG = new Image();
 BIGEXPLOSIONIMG.src = "Assets/Textures/bigExplosion.png";
 let explosions = [];
 
+
+const FPSDISPLAY = new Word({x:res.w-256, y:res.h-16, h:32, o:{x:0,y:0}}, ["0"], "white");
+const FPSDISPLAYR = new Word({x:res.w-256, y:res.h-32-16, h:32, o:{x:0,y:0}}, ["0"], "white");
+
+const RESTARTSCOUNT = new Word({x:res.w-512-128, y:res.h-32-16, h:32, o:{x:0,y:0}}, ["0"], "white");
+const RESTARTSCOUNTR = new Word({x:res.w-512-128, y:res.h-16, h:32, o:{x:0,y:0}}, ["0"], "white");
+
+const TIMER = new Word({x:_VCENTER.x, y:res.h-48, h:48, o:{x:-0.5,y:-0.5}}, ["0"], "white");
+
 function toCanvasCoords(pageX, pageY)
 {
     const _rect = document.querySelector("canvas").getBoundingClientRect();
@@ -39,8 +49,6 @@ function toCanvasCoords(pageX, pageY)
 
     return {x, y};
 }
-
-const display = new Display(canvas);
 
 let levels = [];
 let lIndex = 0;
@@ -97,6 +105,8 @@ function switchLevel(level = 1)
         lIndex = levels.length-1;
         return;
     }
+
+    lIndex = 6;
 
     transitionDirection = level;
 

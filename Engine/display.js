@@ -219,6 +219,10 @@ class Display
             
             addLight(DARKCTX, PLAYER.center.x,PLAYER.center.y, 0,PLAYER.center.x,PLAYER.center.y, 256);
 
+            DARKCTX.globalCompositeOperation = 'source-over';
+            FPSDISPLAY.render(DARKCTX);
+            FPSDISPLAYR.render(DARKCTX);
+
             this.display.drawImage(DARKCTX.canvas,
                 0, 0,
                 DARKCTX.canvas.width, DARKCTX.canvas.height,

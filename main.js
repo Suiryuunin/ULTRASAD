@@ -327,10 +327,24 @@ const render = () =>
         element.render();
     }
 
+    FPSDISPLAY.render();
+    FPSDISPLAYR.render();
+
+    RESTARTSCOUNT.word = ["RESTARTS: "+PLAYER.restarts];
+    RESTARTSCOUNTR.word = ["ROOM RESTARTS: "+currentCtx.restarts];
+    RESTARTSCOUNT.render();
+    RESTARTSCOUNTR.render();
+
+    TIMER.word = ["TIME: "+(_ENGINE.time/60000).toFixed(0).padStart(2, "0")+":"+(_ENGINE.time/1000).toFixed(3).padStart(6,"0")];
+    TIMER.render();
+
+    if (PLAYER.deathScreen.alpha > 0)
+        PLAYER.deathScreen.render();
+
     display.render();
 };
 
-const _ENGINE = new Engine(30, update, render);
+const _ENGINE = new Engine(60, update, render);
 _ENGINE.start();
 
 addEventListener("resize", resize);

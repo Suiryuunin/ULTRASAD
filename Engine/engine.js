@@ -51,6 +51,11 @@ function checkQueuedStop(engine)
     return false;
 }
 
+function setFPS(delta, fpsDisplay, type = "UPDATE")
+{
+    fpsDisplay.word = [type+": "+(1000/delta).toFixed(2)];
+}
+
 class Engine
 {
     constructor (fps, update, render)
@@ -77,13 +82,19 @@ class Engine
                 if (checkQueuedStop(_ENGINE)) return;
                 this.render();
 
+                setFPS(this.delta, FPSDISPLAY, "UPDATE");
+                setFPS(this.deltaR, FPSDISPLAYR, "RENDER");
+
                 this.timeStampR = this.timeStamp = time;
             }
             else if (this.delta >= Math.floor(1000 / 60))
             {
                 this.update();
+                
                 if (checkQueuedStop(_ENGINE)) return;
 
+                setFPS(this.delta, FPSDISPLAY);
+                
                 this.timeStamp = time;
             }
 

@@ -376,7 +376,7 @@ class Maurice extends Dynamic
         InstanceAudio(_DEDSFX, 1).play();
         InstanceAudio(_DEDSFX, 1).play();
 
-        this.dmg(75,{x:0,y:0});
+        this.dmg(32,{x:0,y:0});
         display.stacks += 12;
         shakeReset = 64;
         this.t.h /= 2;

@@ -12,6 +12,10 @@ class Player extends Physics
         this.dying = false;
         this.ULTRACOUNT = -1;
         this.ULTRACTX = {};
+        this.restarts = 0;
+
+        this.deathScreen = new Img({x:_VCENTER.x, y:_VCENTER.y, w:res.w,h:res.h, o:_CENTEROFFSET}, _YOUDIEDIMG, _NOCOLLISION);
+        this.deathScreen.alpha = 0;
 
         this.dmgCD = 0;
 
@@ -60,7 +64,8 @@ class Player extends Physics
         this.keys = {
             "KeyA": false,
             "KeyD": false,
-            "KeyK": false
+            "KeyK": false,
+            "KeyR": false,
         }
 
         this.dashDuration = 2; this.dashTimer = this.dashDuration; this.dashing = false; this.canDash = false; this.dashCooldown = 0; this.airDashLeft = 1;
@@ -82,6 +87,13 @@ class Player extends Physics
 
         window.addEventListener("keydown", (e) =>
         {
+            if (e.code == "KeyR" && !this.keys[e.code])
+            {
+                this.RESTART();
+                this.keys[e.code] = true;
+                return;
+            }
+
             if (this.dying)
                 return;
 
@@ -108,13 +120,17 @@ class Player extends Physics
                 }
                 return;
             }
-            this.frozenDirection = this.axisMapping[code];
+            if (!this.sword.stabbing)
+                this.frozenDirection = this.axisMapping[code];
             this.direction += this.axisMapping[code];
             this.keys[code] = true;
             
         });
         window.addEventListener("keyup", (e) =>
         {
+            if (e.code == "KeyR" && this.keys[e.code])
+                this.keys[e.code] = false;
+
             if (this.dying)
                 return;
             
@@ -243,7 +259,7 @@ class Player extends Physics
 
         if (this.hp <= 0 && !this.dying)
         {
-            this.dmg(64, {x:0,y:0},true);
+            this.dmg(32, {x:0,y:0},true);
             this.Death();
         }
 
@@ -356,10 +372,34 @@ class Player extends Physics
         this.gravityMultiplier = 0;
         this.v.y = 1;
         this.direction = 0;
+
         for (let i = 0; i < this.bullets.length; i++)
         {
             this.bullets[i].explode();
         }
+    }
+    
+    RESTART()
+    {
+        YOUAREDEAD.pause();
+        Battle01.volume = 0.5;
+        this.dying = false;
+        this.deathScreen.alpha = 0;
+        this.alpha = 1;
+        this.hp = this.maxHp;
+        this.hardDmg = 0;
+        this.direction = 0;
+        
+        this.keys["KeyA"] = false;
+        this.keys["KeyD"] = false;
+        this.keys["KeyK"] = false;
+        this.gravityMultiplier = 0;
+        
+        this.t.x = currentCtx.st.x,
+        this.t.y = currentCtx.st.y
+
+        this.restarts++;
+        currentCtx.reset();
     }
 
     lateUpdate()
@@ -373,10 +413,27 @@ class Player extends Physics
             bullet.update();
         }
 
+        if (this.alpha == 0)
+        {
+            this.deathScreen.alpha += 0.01;
+
+            if (Battle01.volume > 0.01)
+                Battle01.volume -= 0.001;
+            if (Battle01.volume < 0.01)
+                Battle01.volume = 0;
+            return;
+        }
+
         if (this.dying)
         {
-            this.alpha *= 0.99;
-            if (this.alpha < 0.1) this.alpha = 0;
+            this.alpha *= 0.95;
+            if (this.alpha < 0.1)
+            {
+                this.alpha = 0;
+                
+                YOUAREDEAD.currentTime = 0;
+                YOUAREDEAD.play();
+            }
             return;
         }
         if (this.sword.update != undefined) this.sword.update();

@@ -1,5 +1,7 @@
 const _ULTRASADIMG = new Image();
 _ULTRASADIMG.src = "Assets/Textures/ULTRASAD.png";
+const _YOUDIEDIMG = new Image();
+_YOUDIEDIMG.src = "Assets/Textures/YOUDIED.png";
 
 const _BulletPIMG = new Image();
 _BulletPIMG.src = "Assets/Characters/Player/bulletP.png";

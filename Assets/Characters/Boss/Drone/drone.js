@@ -279,7 +279,7 @@ class Drone extends Dynamic
         InstanceAudio(_DEDSFX, 1).play();
         InstanceAudio(_DEDSFX, 1).play();
 
-        this.dmg(75,{x:0,y:0});
+        this.dmg(16,{x:0,y:0});
         display.stacks += 12;
         shakeReset = 64;
 
